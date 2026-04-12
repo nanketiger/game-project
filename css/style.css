@@ -1,68 +1,77 @@
+/* 全局重置样式 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* 主体样式 */
 body {
-    background: #87CEEB;
-    height: 100vh;
-    overflow: hidden;
+    background: #87CEEB; /* 天空蓝色背景 */
+    height: 100vh; /* 占满整个视口高度 */
+    overflow: hidden; /* 隐藏溢出内容，防止滚动条 */
 }
 
+/* 玩家样式 */
 #player {
-    width: 30px;
-    height: 50px;
-    background: #ff6347;
-    position: absolute;
-    border-radius: 5px;
+    width: 30px; /* 玩家宽度 */
+    height: 50px; /* 玩家高度 */
+    background: #ff6347; /* 番茄红色玩家 */
+    position: absolute; /* 绝对定位，用于游戏中的移动 */
+    border-radius: 5px; /* 圆角边框 */
 }
 
+/* 子弹样式 */
 .bullet {
-    width: 8px;
-    height: 8px;
-    background: #000;
-    border-radius: 50%;
-    position: absolute;
+    width: 8px; /* 子弹宽度 */
+    height: 8px; /* 子弹高度 */
+    background: #000; /* 黑色子弹 */
+    border-radius: 50%; /* 圆形子弹 */
+    position: absolute; /* 绝对定位，用于子弹飞行 */
 }
 
+/* 地面样式 */
 .ground {
-    width: 100%;
-    height: 100px;
-    background: #567D46;
-    position: absolute;
-    bottom: 0;
+    width: 100%; /* 地面宽度占满屏幕 */
+    height: 100px; /* 地面高度 */
+    background: #567D46; /* 深绿色地面 */
+    position: absolute; /* 绝对定位 */
+    bottom: 0; /* 位于屏幕底部 */
 }
 
+/* 平台样式 */
 .platform {
-    background: #8B4513;
-    position: absolute;
-    border-radius: 4px;
+    background: #8B4513; /* 棕色平台 */
+    position: absolute; /* 绝对定位，用于游戏中的平台放置 */
+    border-radius: 4px; /* 圆角边框 */
 }
 
+/* 怪物样式 */
 .monster {
-    width: 60px;
-    height: 100px;
-    background: #9400D3;
-    position: absolute;
-    border-radius: 5px;
+    width: 60px; /* 怪物宽度 */
+    height: 100px; /* 怪物高度 */
+    background: #9400D3; /* 深紫色怪物 */
+    position: absolute; /* 绝对定位，用于怪物移动 */
+    border-radius: 5px; /* 圆角边框 */
 }
 
+/* 传送门样式 */
 .portal {
-    width: 80px;
-    height: 120px;
-    background: linear-gradient(45deg, #8A2BE2, #4B0082);
-    position: absolute;
-    border-radius: 40px;
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+    width: 80px; /* 传送门宽度 */
+    height: 120px; /* 传送门高度 */
+    background: linear-gradient(45deg, #8A2BE2, #4B0082); /* 紫色渐变背景 */
+    position: absolute; /* 绝对定位，用于放置传送门 */
+    border-radius: 40px; /* 圆角边框，形成圆形传送门效果 */
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.8); /* 紫色发光效果 */
 }
 
+/* 生命值显示样式 */
 #health {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    position: absolute; /* 绝对定位 */
+    top: 20px; /* 距离顶部20px */
+    left: 20px; /* 距离左侧20px */
+    font-size: 24px; /* 字体大小 */
+    font-weight: bold; /* 粗体字 */
+    color: #fff; /* 白色文字 */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字阴影效果 */
 }
