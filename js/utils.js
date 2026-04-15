@@ -76,3 +76,46 @@ function updateHealthDisplay() {
     const healthElement = document.getElementById('health');
     healthElement.textContent = `血量: ${playerHealth}`;
 }
+
+// 开始界面控制
+function initStartScreen() {
+    const startBtn = document.getElementById('start-btn');
+    const startScreen = document.getElementById('start-screen');
+    const gameContainer = document.getElementById('game-container');
+    
+    startBtn.addEventListener('click', startGame);
+    
+    // 添加键盘支持（按空格或回车开始游戏）
+    document.addEventListener('keydown', (e) => {
+        if ((e.key === ' ' || e.key === 'Enter') && startScreen.classList.contains('active')) {
+            startGame();
+        }
+    });
+}
+
+function startGame() {
+    const startScreen = document.getElementById('start-screen');
+    const gameContainer = document.getElementById('game-container');
+    
+    // 切换屏幕显示
+    startScreen.classList.remove('active');
+    startScreen.classList.add('hidden');
+    gameContainer.classList.remove('hidden');
+    gameContainer.classList.add('active');
+    
+    // 初始化游戏
+    initGame();
+}
+
+function initGame() {
+    // 重置游戏状态
+    playerHealth = maxHealth;
+    updateHealthDisplay();
+    
+    // 创建游戏元素
+    createPlatforms();
+    createMonster();
+    
+    // 开始游戏循环
+    loop();
+}

@@ -75,3 +75,76 @@ body {
     color: #fff; /* 白色文字 */
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字阴影效果 */
 }
+
+/* 开始界面样式 下面这些*/
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.active {
+    display: flex;
+}
+
+#start-screen {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.start-content {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+}
+
+.start-content h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.instructions {
+    text-align: left;
+    margin: 30px 0;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.instructions h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.start-button {
+    background: #ff6347;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.start-button:hover {
+    background: #ff4500;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 99, 71, 0.8);
+}
+/* 开始界面样式 上面这些 */

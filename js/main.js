@@ -83,8 +83,10 @@ function refreshMap() {
     if (monster) { monster.remove(); monster = null; }
 
     createPlatforms();
-    monsterHealth *= 2;
+    // 重置怪物状态
+    monsterHealth = 5; // 重置怪物血量
     monsterDirection = -1;
+    monsterSpeed = 2; // 确保怪物速度正确
     createMonster();
 }
 
@@ -193,6 +195,7 @@ function loop() {
 }
 
 // ========== 启动游戏 ==========
-createPlatforms();
-createMonster();
-loop();
+// 初始化开始界面
+document.addEventListener('DOMContentLoaded', function() {
+    initStartScreen();
+});

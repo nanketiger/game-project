@@ -7,8 +7,25 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- 开始界面 -->
+  <div id="start-screen" class="screen active">
+    <div class="start-content">
+      <h1>平台冒险游戏</h1>
+      <div class="instructions">
+        <h3>游戏说明：</h3>
+        <p>• 使用 A/D 键左右移动</p>
+        <p>• 使用 K 键跳跃</p>
+        <p>• 使用 J 键射击</p>
+        <p>• 击败怪物后会出现传送门</p>
+        <p>• 进入传送门进入下一关</p>
+        <p>• 小心不要被怪物碰到！</p>
+      </div>
+      <button id="start-btn" class="start-button">开始游戏</button>
+    </div>
+  </div>
+
   <!-- 游戏主场景结构 -->
-  <div id="game-container">
+  <div id="game-container" class="screen hidden">
     <div id="player"></div>
     <div class="ground"></div>
     <div id="health">血量: 3</div>
