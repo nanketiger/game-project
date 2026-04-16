@@ -216,6 +216,7 @@ function initGame() {
     playerLevel = 1;
     playerExp = 0;
     maxExp = 100;
+    currentLevel = 1; // 重置关卡数为1
     
     updateHealthDisplay();
     updateExpDisplay(); // 初始化经验显示

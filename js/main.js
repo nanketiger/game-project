@@ -31,6 +31,9 @@ let monsterSpeed = 2;
 let monsterDirection = -1;
 let monsterHealth = 5;
 
+// 关卡系统
+let currentLevel = 1; // 当前关卡数
+
 // 传送门
 let portal = null;
 let portalX = 0;
@@ -88,8 +91,10 @@ function refreshMap() {
     if (monster) { monster.remove(); monster = null; }
 
     createPlatforms();
-    // 重置怪物状态
-    monsterHealth = 5; // 重置怪物血量
+    // 增加关卡数
+    currentLevel++;
+    // 怪物血量 = 5 * 关卡数
+    monsterHealth = 5 * currentLevel;
     monsterDirection = -1;
     monsterSpeed = 2; // 确保怪物速度正确
     createMonster();
