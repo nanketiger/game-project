@@ -14,6 +14,11 @@ let isOnGround = false;
 let playerHealth = 3;
 const maxHealth = 3;
 
+// 经验系统
+let playerLevel = 1;
+let playerExp = 0;
+let maxExp = 100;
+
 // 平台
 let platforms = [];
 const platformCount = 8;
