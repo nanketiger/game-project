@@ -14,11 +14,6 @@ let isOnGround = false;
 let playerHealth = 3;
 const maxHealth = 3;
 
-// 经验系统
-let playerLevel = 1;
-let playerExp = 0;
-let maxExp = 100;
-
 // 平台
 let platforms = [];
 const platformCount = 8;
@@ -41,22 +36,9 @@ let portalY = 0;
 
 // ========== 生成函数 ==========
 function createPlatforms() {
-    for (let i = 0; i < platformCount; i++) {
-        const w = 70 + Math.random() * 80;
-        const px = Math.random() * (window.innerWidth - w);
-        const py = groundHeight + 70 + Math.random() * 400;
-        const h = 15;
-
-        const plat = document.createElement('div');
-        plat.className = 'platform';
-        plat.style.width = w + 'px';
-        plat.style.height = h + 'px';
-        plat.style.left = px + 'px';
-        plat.style.bottom = py + 'px';
-        document.body.appendChild(plat);
-
-        platforms.push({ x: px, y: py, w: w, h });
-    }
+    // 完全删除平台生成，游戏中没有平台
+    // 清空平台数组
+    platforms = [];
 }
 
 function createMonster() {

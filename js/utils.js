@@ -88,10 +88,6 @@ function shoot(direction = 'horizontal') {
                 monsterHealth--;
                 b.remove();
                 if (monsterHealth <= 0) {
-                    // 怪物被击杀，给予经验奖励
-                    const expReward = 30 + (playerLevel * 5); // 基础30经验 + 每级5经验
-                    addExp(expReward);
-                    
                     monster.remove();
                     monster = null;
                     createPortal();
@@ -144,42 +140,6 @@ function updateHealthDisplay() {
     healthElement.textContent = `血量: ${playerHealth}`;
 }
 
-// 经验系统函数
-function addExp(amount) {
-    playerExp += amount;
-    
-    // 检查是否升级
-    while (playerExp >= maxExp) {
-        playerExp -= maxExp;
-        playerLevel++;
-        maxExp = Math.floor(maxExp * 1.2); // 每级增加20%经验需求
-        
-        // 升级奖励：恢复血量
-        playerHealth = maxHealth;
-        updateHealthDisplay();
-        
-        // 可以在这里添加其他升级效果
-        console.log(`升级到 ${playerLevel} 级！`);
-    }
-    
-    updateExpDisplay();
-}
-
-function updateExpDisplay() {
-    const levelElement = document.getElementById('level');
-    const currentExpElement = document.getElementById('current-exp');
-    const maxExpElement = document.getElementById('max-exp');
-    const expFillElement = document.getElementById('exp-fill');
-    
-    if (levelElement) levelElement.textContent = playerLevel;
-    if (currentExpElement) currentExpElement.textContent = playerExp;
-    if (maxExpElement) maxExpElement.textContent = maxExp;
-    if (expFillElement) {
-        const expPercentage = (playerExp / maxExp) * 100;
-        expFillElement.style.width = expPercentage + '%';
-    }
-}
-
 // 开始界面控制
 function initStartScreen() {
     const startBtn = document.getElementById('start-btn');
@@ -213,13 +173,9 @@ function startGame() {
 function initGame() {
     // 重置游戏状态
     playerHealth = maxHealth;
-    playerLevel = 1;
-    playerExp = 0;
-    maxExp = 100;
     currentLevel = 1; // 重置关卡数为1
     
     updateHealthDisplay();
-    updateExpDisplay(); // 初始化经验显示
     
     // 创建游戏元素
     createPlatforms();
