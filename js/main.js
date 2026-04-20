@@ -36,6 +36,11 @@ let portalY = 0;
 
 // ========== 生成函数 ==========
 
+function createPlatforms() {
+    // 清空平台数组，游戏中没有平台
+    platforms = [];
+}
+
 function createMonster() {
     monster = document.createElement('div');
     monster.className = 'monster';
