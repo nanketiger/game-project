@@ -4,7 +4,7 @@ const groundHeight = 100;
 
 let x = 200;
 let y = 0;
-const speed = 5;
+const speed = 3.5;
 const jumpPower = 10;
 let vy = 0;
 const gravity = 0.25;

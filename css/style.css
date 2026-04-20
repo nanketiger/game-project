@@ -63,6 +63,7 @@ body {
     position: absolute; /* 绝对定位，用于放置传送门 */
     border-radius: 40px; /* 圆角边框，形成圆形传送门效果 */
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.8); /* 紫色发光效果 */
+    z-index: 5; /* 传送门层级 */
 }
 
 /* 生命值显示样式 */
@@ -86,6 +87,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 100; /* 界面层级，确保在游戏元素之上 */
 }
 
 .hidden {
