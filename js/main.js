@@ -19,12 +19,7 @@ let platforms = [];
 const platformCount = 8;
 
 // 怪物
-let monster = null;
-let monsterX = 0;
-let monsterY = 0;
-let monsterSpeed = 2;
-let monsterDirection = -1;
-let monsterHealth = 5;
+let monsters = []; // 用数组统一管理当前关卡的所有怪物
 
 // 关卡系统
 let currentLevel = 1; // 当前关卡数
@@ -39,16 +34,6 @@ let portalY = 0;
 function createPlatforms() {
     // 清空平台数组，游戏中没有平台
     platforms = [];
-}
-
-function createMonster() {
-    monster = document.createElement('div');
-    monster.className = 'monster';
-    monsterX = window.innerWidth - 60;
-    monsterY = groundHeight;
-    monster.style.left = monsterX + 'px';
-    monster.style.bottom = monsterY + 'px';
-    document.body.appendChild(monster);
 }
 
 function createPortal() {
@@ -70,16 +55,20 @@ function clearPlatforms() {
 function refreshMap() {
     clearPlatforms();
     if (portal) { portal.remove(); portal = null; }
-    if (monster) { monster.remove(); monster = null; }
+    
+    // 清理旧怪物
+    monsters.forEach(m => m.element.remove());
+    monsters = [];
 
     createPlatforms();
-    // 增加关卡数
     currentLevel++;
-    // 怪物血量 = 5 * 关卡数
-    monsterHealth = 5 * currentLevel;
-    monsterDirection = -1;
-    monsterSpeed = 2; // 确保怪物速度正确
-    createMonster();
+    
+    // 关卡越高，怪物越多（这里设定每关加1只，最多8只）
+    let monsterCount = Math.min(1 + currentLevel, 8); 
+    for(let i = 0; i < monsterCount; i++) {
+        let randomX = Math.random() * (window.innerWidth - 100);
+        monsters.push(new Monster(randomX, groundHeight, currentLevel));
+    }
 }
 
 // ========== 主循环 ==========
@@ -135,20 +124,13 @@ function loop() {
     isOnGround = (y <= 0 || onPlatform);
 
     // 怪物移动 + 碰撞伤害
-    if (monster && monsterHealth > 0) {
-        monsterX += monsterSpeed * monsterDirection;
-        if (monsterX <= 0) {
-            monsterX = 0;
-            monsterDirection = 1;
-        } else if (monsterX >= window.innerWidth - 60) {
-            monsterX = window.innerWidth - 60;
-            monsterDirection = -1;
-        }
-        monster.style.left = monsterX + 'px';
+    for (let i = 0; i < monsters.length; i++) {
+        let m = monsters[i];
+        m.update(); // 让每只怪物动起来
 
-        // 受伤检测
+        // 玩家受伤检测
         const pRect = player.getBoundingClientRect();
-        const mRect = monster.getBoundingClientRect();
+        const mRect = m.element.getBoundingClientRect();
         const now = Date.now();
 
         if (
