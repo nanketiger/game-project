@@ -59,11 +59,58 @@ body {
 .portal {
     width: 80px; /* 传送门宽度 */
     height: 120px; /* 传送门高度 */
-    background: linear-gradient(45deg, #8A2BE2, #4B0082); /* 紫色渐变背景 */
+    background: conic-gradient(from 0deg, #8A2BE2, #9400D3, #4B0082, #8A2BE2);
     position: absolute; /* 绝对定位，用于放置传送门 */
-    border-radius: 40px; /* 圆角边框，形成圆形传送门效果 */
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.8); /* 紫色发光效果 */
+    border-radius: 40px; /* 圆角边框，形成椭圆形传送门效果 */
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), inset 0 0 20px #000;
     z-index: 5; /* 传送门层级 */
+    animation: portalPulse 1.5s ease-in-out infinite alternate;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+/* 传送门内部漩涡特效 */
+.portal::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border-radius: 30px;
+    border: 4px dashed rgba(255, 255, 255, 0.6);
+    animation: portalSwirl 4s linear infinite reverse;
+}
+
+/* 粒子样式 */
+.portal-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #DDA0DD;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #DDA0DD;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 6;
+}
+
+@keyframes portalSwirl {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes portalPulse {
+    0% { transform: scale(1); box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), inset 0 0 20px #000; }
+    100% { transform: scale(1.05); box-shadow: 0 0 40px rgba(138, 43, 226, 1), inset 0 0 30px #000; }
+}
+
+@keyframes suckIn {
+    0% { transform: translate(var(--startX), var(--startY)) scale(1); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(0, 0) scale(0); opacity: 0; }
 }
 
 /* 生命值显示样式 */
@@ -99,14 +146,15 @@ body {
 }
 
 #start-screen {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: url('../images/bg.png') no-repeat center center;
+    background-size: cover; /* 让图片等比例缩放铺满整个屏幕 */
     color: white;
     font-family: Arial, sans-serif;
 }
 
 .start-content {
     text-align: center;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(135, 135, 176, 0.626);
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
@@ -133,21 +181,25 @@ body {
 }
 
 .start-button {
-    background: #ff6347;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(45, 1, 42, 0.6));
+    backdrop-filter: blur(8px); /* 磨砂玻璃材质，让背后的景色透过来并模糊 */
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* 加上微弱的白边提取轮廓 */
     color: white;
-    border: none;
     padding: 15px 40px;
     font-size: 20px;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .start-button:hover {
-    background: #ff4500;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.7), rgba(45, 1, 42, 0.9));
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255, 99, 71, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5); /* 鼠标放上去时边框变亮 */
+    box-shadow: 0 0 25px rgba(138, 43, 226, 0.8); /* 原来的红色背光改成紫色光影，更有氛围感 */
 }
 /* 开始界面样式 上面这些 */
 

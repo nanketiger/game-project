@@ -5,14 +5,14 @@ const groundHeight = 100;
 let x = 200;
 let y = 0;
 const speed = 3.5;
-const jumpPower = 10;
+const jumpPower = 20;
 let vy = 0;
-const gravity = 0.25;
+const gravity = 0.5;
 let isOnGround = false;
 
 // 血量
-let playerHealth = 3;
-const maxHealth = 3;
+let playerHealth = 100;
+const maxHealth = 100;
 
 // 平台
 let platforms = [];
@@ -58,6 +58,29 @@ function createPortal() {
     portalY = groundHeight + 100;
     portal.style.left = portalX + 'px';
     portal.style.bottom = portalY + 'px';
+    
+    // 生成粒子
+    for (let i = 0; i < 20; i++) {
+        let particle = document.createElement('div');
+        particle.className = 'portal-particle';
+        
+        // 随机生成粒子起始位置，在周围一个稍大一点的范围内
+        let angle = Math.random() * Math.PI * 2;
+        let radius = 60 + Math.random() * 60; // 60 到 120 的距离
+        let startX = Math.cos(angle) * radius + 'px';
+        let startY = Math.sin(angle) * radius + 'px';
+        
+        particle.style.setProperty('--startX', startX);
+        particle.style.setProperty('--startY', startY);
+        
+        // 随机动画时长和延迟，形成连绵不断的吸入效果
+        let duration = 0.8 + Math.random() * 1.5;
+        let delay = Math.random() * 2;
+        particle.style.animation = `suckIn ${duration}s ease-in ${delay}s infinite`;
+        
+        portal.appendChild(particle);
+    }
+    
     document.body.appendChild(portal);
 }
 
