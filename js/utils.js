@@ -76,23 +76,30 @@ function shoot(direction = 'horizontal') {
         b.style.bottom = t + 'px';
 
         // 击中怪物检测
-        if (monster && monsterHealth > 0 && monster.parentNode) {
+        for (let i = monsters.length - 1; i >= 0; i--) {
+            let m = monsters[i];
             const bulletRect = b.getBoundingClientRect();
-            const monsterRect = monster.getBoundingClientRect();
+            const monsterRect = m.element.getBoundingClientRect();
+            
             if (
                 bulletRect.left < monsterRect.right &&
                 bulletRect.right > monsterRect.left &&
                 bulletRect.top < monsterRect.bottom &&
                 bulletRect.bottom > monsterRect.top
             ) {
-                monsterHealth--;
-                b.remove();
-                if (monsterHealth <= 0) {
-                    monster.remove();
-                    monster = null;
-                    createPortal();
+                // 子弹命中
+                b.remove(); 
+                
+                // 怪物扣血
+                if (m.takeDamage(1)) {
+                    monsters.splice(i, 1); // 怪物死亡，从数组中移除
+                    
+                    // 当数组清空（怪物全灭）且传送门没出现时，生成传送门
+                    if (monsters.length === 0 && !portal) {
+                        createPortal();
+                    }
                 }
-                return;
+                return; // 子弹穿透取消，打中就消失
             }
         }
 
@@ -173,13 +180,12 @@ function startGame() {
 function initGame() {
     // 重置游戏状态
     playerHealth = maxHealth;
-    currentLevel = 1; // 重置关卡数为1
+    currentLevel = 0; // 设为0，因为下面调用 refreshMap 时会自动 +1
     
     updateHealthDisplay();
     
-    // 创建游戏元素
-    createPlatforms();
-    createMonster();
+    // 统一使用 refreshMap() 来初始化地图和生成第一波怪物
+    refreshMap(); 
     
     // 开始游戏循环
     loop();
