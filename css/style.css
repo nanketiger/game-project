@@ -14,13 +14,61 @@ body {
 
 /* 玩家样式 */
 #player {
-    width: 30px; /* 玩家宽度 */
-    height: 50px; /* 玩家高度 */
-    background: #ff6347; /* 番茄红色玩家 */
-    position: absolute; /* 绝对定位，用于游戏中的移动 */
-    border-radius: 5px; /* 圆角边框 */
+    position: absolute;
+    transform: scale(0.4);       
+    transform-origin: bottom center; 
+    
+}
+#player.idle {
+    width: 150px;               
+    height: 143px;
+    background-image: url('../images/idle3.png'); 
+    background-size: 900px 143px; 
+    animation: idle-anim 3s steps(5) infinite; 
+}
+@keyframes idle-anim {
+    from { background-position: 0px 0px; }
+    /* 图片总宽是 900px，向左移动到 -900px 刚好播完完整的 6 帧 */
+    to { background-position: -900px 0px; } 
 }
 
+/* #player 的基础毛坯代码保持不变（负责位置、初始大小） 
+#player {
+    position: absolute;
+    transform: scale(0.4);       
+    transform-origin: bottom center; 
+    no-repeat; 
+}
+
+ 1. 定义待机动作（默认） 
+#player.idle {
+    width: 128px;               
+    height: 128px;
+    background-image: url('images/idle.png'); 
+    background-size: 768px 128px; 
+    animation: idle-anim 0.6s steps(6) infinite; 
+}
+
+ 2. 定义跑步动作 
+#player.running {
+    width: 128px;               
+    height: 128px;
+    background-image: url('images/run.png'); 
+    background-size: 1024px 128px; 
+    animation: run-anim 0.5s steps(8) infinite; 
+}
+
+ 定义各自的 keyframes 
+@keyframes idle-anim {
+    from { background-position: 0px 0px; }
+    to { background-position: -768px 0px; } 
+}
+
+@keyframes run-anim {
+    from { background-position: 0px 0px; }
+    to { background-position: -1024px 0px; } 
+}
+*/
 /* 子弹样式 */
 .bullet {
     width: 8px; /* 子弹宽度 */

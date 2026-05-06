@@ -188,6 +188,11 @@ function loop() {
     player.style.left = x + 'px';
     player.style.bottom = groundHeight + y + 'px';
 
+    // 默认给玩家赋予待机类名
+    player.className = 'idle';
+    // 根据面朝方向水平翻转（因为原图缩放了0.3，所以X轴缩放要乘以0.3）
+    player.style.transform = `scaleX(${faceDir * 0.3}) scaleY(0.3)`;
+
     requestAnimationFrame(loop);
 }
 
