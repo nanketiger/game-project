@@ -90,8 +90,11 @@ function shoot(direction = 'horizontal') {
                 // 子弹命中
                 b.remove(); 
                 
-                // 怪物扣血
-                if (m.takeDamage(1)) {
+                // 【新增】计算击退方向：如果子弹有水平速度，按子弹方向；如果是垂直射击，按玩家面朝方向
+                let knockbackDir = bulletSpeedX !== 0 ? Math.sign(bulletSpeedX) : faceDir;
+                
+                // 【修改】传入伤害值和击退方向
+                if (m.takeDamage(1, knockbackDir)) {
                     monsters.splice(i, 1); // 怪物死亡，从数组中移除
                     
                     // 当数组清空（怪物全灭）且传送门没出现时，生成传送门

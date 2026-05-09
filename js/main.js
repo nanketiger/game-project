@@ -21,6 +21,9 @@ const platformCount = 8;
 // 怪物
 let monsters = []; // 用数组统一管理当前关卡的所有怪物
 
+// 掉落物管理
+let drops = [];
+
 // 关卡系统
 let currentLevel = 1; // 当前关卡数
 
@@ -69,6 +72,23 @@ function createPortal() {
     document.body.appendChild(portal);
 }
 
+// 生成掉落物
+function spawnDrop(x, y) {
+    const drop = document.createElement('div');
+    drop.className = 'drop-item';
+    // 让掉落物生成在怪物中心稍高一点的位置
+    drop.style.left = (x + 20) + 'px'; 
+    drop.style.bottom = (y + 10) + 'px';
+    
+    document.getElementById('game-container').appendChild(drop);
+    
+    drops.push({
+        element: drop,
+        x: x + 20,
+        y: y + 10
+    });
+}
+
 // ========== 地图刷新 ==========
 function clearPlatforms() {
     document.querySelectorAll('.platform').forEach(plat => plat.remove());
@@ -82,6 +102,10 @@ function refreshMap() {
     // 清理旧怪物
     monsters.forEach(m => m.element.remove());
     monsters = [];
+
+    // 清理旧掉落物
+    drops.forEach(d => d.element.remove());
+    drops = [];
 
     createPlatforms();
     currentLevel++;
@@ -166,6 +190,27 @@ function loop() {
                 playerHealth = Math.max(0, playerHealth - 1);
                 lastDamageTime = now;
                 updateHealthDisplay();
+            }
+        }
+    }
+
+    // 拾取掉落物检测
+    for (let i = drops.length - 1; i >= 0; i--) {
+        let drop = drops[i];
+        const pRect = player.getBoundingClientRect();
+        const dRect = drop.element.getBoundingClientRect();
+        
+        if (
+            pRect.left < dRect.right &&
+            pRect.right > dRect.left &&
+            pRect.top < dRect.bottom &&
+            pRect.bottom > dRect.top
+        ) {
+            // 拾取成功：先尝试放进背包
+            if (addItemToBackpack("紫怪核心")) {
+                // 放进背包成功，才从画面中移除
+                drop.element.remove();
+                drops.splice(i, 1);
             }
         }
     }

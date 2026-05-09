@@ -115,3 +115,58 @@ function selectSlot(index) {
 document.addEventListener('DOMContentLoaded', function() {
     initBackpack();
 });
+
+// 支持物品叠加的拾取逻辑
+function addItemToBackpack(itemName, color = '#FFD700') {
+    const slots = document.querySelectorAll('.backpack-slot');
+    let firstEmptySlot = null;
+
+    // 1. 第一轮遍历：先查找是否已经有同名物品
+    for (let i = 0; i < slots.length; i++) {
+        const slot = slots[i];
+        
+        // 如果发现同名物品，直接叠加数量！
+        if (slot.dataset.item === itemName) {
+            // 获取当前数量，如果没有记录则默认为 1
+            let count = parseInt(slot.dataset.count || 1);
+            count++;
+            slot.dataset.count = count; // 更新数据
+            
+            // 更新 UI，在名字后面加上数量 (比如 x2, x3)
+            const nameSpan = slot.querySelector('.item-name');
+            if (nameSpan) {
+                nameSpan.textContent = `${itemName} x${count}`;
+            }
+            
+            // 顺便给个被拾取堆叠时的放大闪烁反馈（可选）
+            slot.style.transform = 'scale(1.1)';
+            setTimeout(() => slot.style.transform = '', 150);
+            
+            return true; // 叠加成功，拾取结束
+        }
+        
+        // 顺便记录一下遇到的第一个空格子，供下面第 2 步使用
+        if (!firstEmptySlot && slot.querySelector('.slot-empty')) {
+            firstEmptySlot = slot;
+        }
+    }
+
+    // 2. 如果背包里没有同名物品，且有空格子，则占个新位置
+    if (firstEmptySlot) {
+        firstEmptySlot.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div style="width:16px; height:16px; background:${color}; transform:rotate(45deg); box-shadow:0 0 10px ${color}; margin-bottom:8px;"></div>
+                <!-- 加上 class="item-name" 方便上面叠加时去修改文字 -->
+                <span class="item-name" style="font-size:12px; color:#fff;">${itemName} x1</span>
+            </div>
+        `;
+        // 给格子打上标记：存了什么物品、存了几个
+        firstEmptySlot.dataset.item = itemName;
+        firstEmptySlot.dataset.count = 1; 
+        
+        return true; // 占位成功
+    }
+    
+    console.log("背包满了！");
+    return false; // 既没有同名物品，也没有空位，拾取失败
+}
