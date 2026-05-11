@@ -73,19 +73,22 @@ function createPortal() {
 }
 
 // 生成掉落物
-function spawnDrop(x, y) {
+function spawnDrop(x, y, itemName = '紫怪核心', dropColor = '#FFD700') {
     const drop = document.createElement('div');
     drop.className = 'drop-item';
-    // 让掉落物生成在怪物中心稍高一点的位置
-    drop.style.left = (x + 20) + 'px'; 
+    drop.style.left = (x + 20) + 'px';
     drop.style.bottom = (y + 10) + 'px';
-    
+    drop.style.background = dropColor;
+    drop.style.boxShadow = `0 0 10px ${dropColor}, 0 0 20px ${dropColor}`;
+
     document.getElementById('game-container').appendChild(drop);
-    
+
     drops.push({
         element: drop,
         x: x + 20,
-        y: y + 10
+        y: y + 10,
+        itemName: itemName,
+        dropColor: dropColor
     });
 }
 
@@ -93,6 +96,16 @@ function spawnDrop(x, y) {
 function clearPlatforms() {
     document.querySelectorAll('.platform').forEach(plat => plat.remove());
     platforms = [];
+}
+
+// 按关卡随机怪物类型
+function rollMonsterType(level) {
+    if (level <= 2) return 'patrol';
+    const pool = ['patrol'];
+    if (level >= 3) pool.push('chase', 'chase');
+    if (level >= 4) pool.push('tank');
+    if (level >= 5) pool.push('sky');
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function refreshMap() {
@@ -110,11 +123,16 @@ function refreshMap() {
     createPlatforms();
     currentLevel++;
     
-    // 关卡越高，怪物越多（这里设定每关加1只，最多8只）
-    let monsterCount = Math.min(1 + currentLevel, 8); 
-    for(let i = 0; i < monsterCount; i++) {
+    // 关卡越高，怪物越多（每关加1只，最多12只）
+    let monsterCount = Math.min(1 + currentLevel, 12);
+    for (let i = 0; i < monsterCount; i++) {
         let randomX = Math.random() * (window.innerWidth - 100);
-        monsters.push(new Monster(randomX, groundHeight, currentLevel));
+        let type = rollMonsterType(currentLevel);
+        if (type === 'sky') {
+            monsters.push(new Monster(randomX, groundHeight + 400, currentLevel, type));
+        } else {
+            monsters.push(new Monster(randomX, groundHeight, currentLevel, type));
+        }
     }
 }
 
@@ -173,7 +191,10 @@ function loop() {
     // 怪物移动 + 碰撞伤害
     for (let i = 0; i < monsters.length; i++) {
         let m = monsters[i];
-        m.update(); // 让每只怪物动起来
+        m.update();
+
+        // 天空怪不参与地面接触伤害
+        if (m.type === 'sky') continue;
 
         // 玩家受伤检测
         const pRect = player.getBoundingClientRect();
@@ -207,7 +228,7 @@ function loop() {
             pRect.bottom > dRect.top
         ) {
             // 拾取成功：先尝试放进背包
-            if (addItemToBackpack("紫怪核心")) {
+            if (addItemToBackpack(drop.itemName || '紫怪核心', drop.dropColor || '#FFD700')) {
                 // 放进背包成功，才从画面中移除
                 drop.element.remove();
                 drops.splice(i, 1);

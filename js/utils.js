@@ -94,7 +94,7 @@ function shoot(direction = 'horizontal') {
                 let knockbackDir = bulletSpeedX !== 0 ? Math.sign(bulletSpeedX) : faceDir;
                 
                 // 【修改】传入伤害值和击退方向
-                if (m.takeDamage(1, knockbackDir)) {
+                if (m.takeDamage(5, knockbackDir)) {
                     monsters.splice(i, 1); // 怪物死亡，从数组中移除
                     
                     // 当数组清空（怪物全灭）且传送门没出现时，生成传送门
