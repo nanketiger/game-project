@@ -24,11 +24,21 @@
     </div>
   </div>
 
+  <!-- 胜利界面 -->
+  <div id="victory-screen" class="screen hidden">
+    <div class="victory-content">
+      <h1>恭喜通关！</h1>
+      <p>你已成功通过全部 10 个关卡</p>
+      <button id="restart-btn" class="start-button">重新开始</button>
+    </div>
+  </div>
+
   <!-- 游戏主场景结构 -->
   <div id="game-container" class="screen hidden">
     <div id="player"></div>
     <div class="ground"></div>
     <div id="health">血量: 3</div>
+    <div id="level-info">关卡: 1 / 10</div>
     <div id="game-tip" style="position: absolute; top:60px; left:20px; color:white; font-size:16px;">
       A/D 移动 | K 跳跃 | J 射击 | B背包
     </div>
