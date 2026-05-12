@@ -163,13 +163,24 @@ body {
 
 /* 生命值显示样式 */
 #health {
-    position: absolute; /* 绝对定位 */
-    top: 20px; /* 距离顶部20px */
-    left: 20px; /* 距离左侧20px */
-    font-size: 24px; /* 字体大小 */
-    font-weight: bold; /* 粗体字 */
-    color: #fff; /* 白色文字 */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* 文字阴影效果 */
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* 关卡数显示 */
+#level-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 /* 开始界面样式 下面这些*/
@@ -439,6 +450,36 @@ body {
     transform: rotate(45deg); /* 旋转成菱形晶体 */
     z-index: 4;
     animation: floatAnim 1s ease-in-out infinite alternate;
+}
+
+/* 胜利界面样式 */
+#victory-screen {
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 200;
+}
+
+.victory-content {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(0, 0, 0, 0.8));
+    backdrop-filter: blur(10px);
+    padding: 50px 60px;
+    border-radius: 20px;
+    border: 2px solid rgba(138, 43, 226, 0.6);
+    box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+    max-width: 500px;
+}
+
+.victory-content h1 {
+    font-size: 52px;
+    color: #FFD700;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.victory-content p {
+    font-size: 20px;
+    color: #ecf0f1;
+    margin-bottom: 30px;
 }
 
 /* 掉落物上下悬浮的动画 */

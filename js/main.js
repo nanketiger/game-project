@@ -14,29 +14,39 @@ let isOnGround = false;
 let playerHealth = 100;
 const maxHealth = 100;
 
+// 子弹伤害
+let bulletDamage = 100;
+
 // 平台
 let platforms = [];
-const platformCount = 8;
 
 // 怪物
-let monsters = []; // 用数组统一管理当前关卡的所有怪物
+let monsters = [];
 
 // 掉落物管理
 let drops = [];
 
 // 关卡系统
-let currentLevel = 1; // 当前关卡数
+const MAX_LEVEL = 10;
+let currentLevel = 1;
 
 // 传送门
 let portal = null;
 let portalX = 0;
 let portalY = 0;
 
-// ========== 生成函数 ==========
+// ========== 工具函数 ==========
 
-function createPlatforms() {
-    // 清空平台数组，游戏中没有平台
-    platforms = [];
+// 创建平台
+function addPlatform(x, y, w, h) {
+    const el = document.createElement('div');
+    el.className = 'platform';
+    el.style.left = x + 'px';
+    el.style.bottom = y + 'px';
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    document.getElementById('game-container').appendChild(el);
+    platforms.push({ x, y, w, h, element: el });
 }
 
 function createPortal() {
@@ -46,29 +56,22 @@ function createPortal() {
     portalY = groundHeight + 100;
     portal.style.left = portalX + 'px';
     portal.style.bottom = portalY + 'px';
-    
-    // 生成粒子
+
     for (let i = 0; i < 20; i++) {
         let particle = document.createElement('div');
         particle.className = 'portal-particle';
-        
-        // 随机生成粒子起始位置，在周围一个稍大一点的范围内
         let angle = Math.random() * Math.PI * 2;
-        let radius = 60 + Math.random() * 60; // 60 到 120 的距离
+        let radius = 60 + Math.random() * 60;
         let startX = Math.cos(angle) * radius + 'px';
         let startY = Math.sin(angle) * radius + 'px';
-        
         particle.style.setProperty('--startX', startX);
         particle.style.setProperty('--startY', startY);
-        
-        // 随机动画时长和延迟，形成连绵不断的吸入效果
         let duration = 0.8 + Math.random() * 1.5;
         let delay = Math.random() * 2;
         particle.style.animation = `suckIn ${duration}s ease-in ${delay}s infinite`;
-        
         portal.appendChild(particle);
     }
-    
+
     document.body.appendChild(portal);
 }
 
@@ -82,7 +85,6 @@ function spawnDrop(x, y, itemName = '紫怪核心', dropColor = '#FFD700') {
     drop.style.boxShadow = `0 0 10px ${dropColor}, 0 0 20px ${dropColor}`;
 
     document.getElementById('game-container').appendChild(drop);
-
     drops.push({
         element: drop,
         x: x + 20,
@@ -92,7 +94,7 @@ function spawnDrop(x, y, itemName = '紫怪核心', dropColor = '#FFD700') {
     });
 }
 
-// ========== 地图刷新 ==========
+// ========== 清场 ==========
 function clearPlatforms() {
     document.querySelectorAll('.platform').forEach(plat => plat.remove());
     platforms = [];
@@ -108,36 +110,233 @@ function rollMonsterType(level) {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function refreshMap() {
+function clearMap() {
     clearPlatforms();
     if (portal) { portal.remove(); portal = null; }
-    
-    // 清理旧怪物
     monsters.forEach(m => m.element.remove());
     monsters = [];
-
-    // 清理旧掉落物
     drops.forEach(d => d.element.remove());
     drops = [];
+}
 
-    createPlatforms();
-    currentLevel++;
-    
-    // 关卡越高，怪物越多（每关加1只，最多12只）
-    let monsterCount = Math.min(1 + currentLevel, 12);
-    for (let i = 0; i < monsterCount; i++) {
-        let randomX = Math.random() * (window.innerWidth - 100);
-        let type = rollMonsterType(currentLevel);
-        if (type === 'sky') {
-            monsters.push(new Monster(randomX, groundHeight + 400, currentLevel, type));
-        } else {
-            monsters.push(new Monster(randomX, groundHeight, currentLevel, type));
-        }
+// ========== 10个房间生成函数 ==========
+
+// 第1关：入门关 — 平坦地面，2只怪物
+function generateRoom1() {
+    let positions = [200, window.innerWidth - 260];
+    for (let px of positions) {
+        monsters.push(new Monster(px, groundHeight, currentLevel));
     }
+}
+
+// 第2关：低矮平台 — 2个低平台，3只怪物
+function generateRoom2() {
+    const W = window.innerWidth;
+    addPlatform(100, 150, 120, 20);
+    addPlatform(W - 220, 150, 120, 20);
+    monsters.push(new Monster(80, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, 170, currentLevel));
+    monsters.push(new Monster(W - 140, groundHeight, currentLevel));
+}
+
+// 第3关：阶梯平台 — 3个不同高度平台，4只怪物
+function generateRoom3() {
+    const W = window.innerWidth;
+    addPlatform(50, 130, 100, 20);
+    addPlatform(W / 2 - 60, 180, 120, 20);
+    addPlatform(W - 150, 230, 100, 20);
+    monsters.push(new Monster(60, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 20, 200, currentLevel));
+    monsters.push(new Monster(W / 2 + 30, 250, currentLevel));
+    monsters.push(new Monster(W - 100, groundHeight, currentLevel));
+}
+
+// 第4关：多层平台 — 两侧低中间高，5只怪物
+function generateRoom4() {
+    const W = window.innerWidth;
+    addPlatform(W / 2 - 180, 140, 100, 20);
+    addPlatform(W / 2 - 60, 200, 120, 20);
+    addPlatform(W / 2 + 60, 140, 100, 20);
+    addPlatform(W / 2 - 60, 260, 120, 20);
+    monsters.push(new Monster(80, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, 160, currentLevel));
+    monsters.push(new Monster(W / 2, 220, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, 280, currentLevel));
+    monsters.push(new Monster(W - 140, groundHeight, currentLevel));
+}
+
+// 第5关：裂谷 — 中间断开需跳跃，6只怪物
+function generateRoom5() {
+    const W = window.innerWidth;
+    addPlatform(80, 130, 150, 20);
+    addPlatform(W - 230, 130, 150, 20);
+    addPlatform(W / 2 - 50, 190, 100, 20);
+    monsters.push(new Monster(100, 150, currentLevel));
+    monsters.push(new Monster(200, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 20, 210, currentLevel));
+    monsters.push(new Monster(W / 2 + 20, groundHeight, currentLevel));
+    monsters.push(new Monster(W - 200, 150, currentLevel));
+    monsters.push(new Monster(W - 100, groundHeight, currentLevel));
+}
+
+// 第6关：双层结构 — 上下两层平台，6只怪物
+function generateRoom6() {
+    const W = window.innerWidth;
+    addPlatform(50, 120, 200, 20);
+    addPlatform(W - 250, 120, 200, 20);
+    addPlatform(100, 200, 150, 20);
+    addPlatform(W / 2 - 75, 200, 150, 20);
+    addPlatform(W - 250, 200, 150, 20);
+    monsters.push(new Monster(80, 140, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, 220, currentLevel));
+    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel));
+    monsters.push(new Monster(W - 200, 220, currentLevel));
+    monsters.push(new Monster(W - 80, 140, currentLevel));
+    monsters.push(new Monster(W / 2 - 40, groundHeight, currentLevel));
+}
+
+// 第7关：浮空岛群 — 多个分散小平台，7只怪物
+function generateRoom7() {
+    const W = window.innerWidth;
+    addPlatform(60, 100, 80, 20);
+    addPlatform(200, 160, 80, 20);
+    addPlatform(360, 120, 80, 20);
+    addPlatform(W / 2 - 40, 200, 80, 20);
+    addPlatform(W - 280, 160, 80, 20);
+    addPlatform(W - 140, 100, 80, 20);
+    monsters.push(new Monster(80, 120, currentLevel));
+    monsters.push(new Monster(220, 180, currentLevel));
+    monsters.push(new Monster(380, 140, currentLevel));
+    monsters.push(new Monster(W / 2, 220, currentLevel));
+    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel));
+    monsters.push(new Monster(W - 260, 180, currentLevel));
+    monsters.push(new Monster(W - 120, 120, currentLevel));
+}
+
+// 第8关：高塔 — 多层堆叠，7只怪物
+function generateRoom8() {
+    const W = window.innerWidth;
+    addPlatform(W / 2 - 150, 120, 100, 20);
+    addPlatform(W / 2 - 120, 180, 100, 20);
+    addPlatform(W / 2 - 90, 240, 100, 20);
+    addPlatform(W / 2 - 10, 120, 100, 20);
+    addPlatform(W / 2 + 10, 180, 100, 20);
+    addPlatform(W / 2 + 30, 240, 100, 20);
+    monsters.push(new Monster(W / 2 - 130, 140, currentLevel));
+    monsters.push(new Monster(W / 2 - 100, 200, currentLevel));
+    monsters.push(new Monster(W / 2 - 70, 260, currentLevel));
+    monsters.push(new Monster(60, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 + 80, 200, currentLevel));
+    monsters.push(new Monster(W / 2 + 60, 260, currentLevel));
+    monsters.push(new Monster(W - 120, groundHeight, currentLevel));
+}
+
+// 第9关：竞技场 — 四角 + 中央平台，8只怪物
+function generateRoom9() {
+    const W = window.innerWidth;
+    addPlatform(40, 100, 80, 20);
+    addPlatform(W - 120, 100, 80, 20);
+    addPlatform(40, 220, 80, 20);
+    addPlatform(W - 120, 220, 80, 20);
+    addPlatform(W / 2 - 100, 160, 200, 20);
+    monsters.push(new Monster(60, 120, currentLevel));
+    monsters.push(new Monster(60, 240, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, 180, currentLevel));
+    monsters.push(new Monster(W / 2 + 30, 180, currentLevel));
+    monsters.push(new Monster(W - 100, 120, currentLevel));
+    monsters.push(new Monster(W - 100, 240, currentLevel));
+    monsters.push(new Monster(W / 2 - 80, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 + 80, groundHeight, currentLevel));
+}
+
+// 第10关：最终关 — 对称多层布局，8只怪物满配
+function generateRoom10() {
+    const W = window.innerWidth;
+    addPlatform(W / 2 - 40, 280, 80, 20);
+    addPlatform(W / 2 - 160, 220, 100, 20);
+    addPlatform(W / 2 + 60, 220, 100, 20);
+    addPlatform(60, 160, 120, 20);
+    addPlatform(W - 180, 160, 120, 20);
+    addPlatform(150, 100, 100, 20);
+    addPlatform(W - 250, 100, 100, 20);
+    monsters.push(new Monster(W / 2 - 20, 300, currentLevel));
+    monsters.push(new Monster(W / 2 - 140, 240, currentLevel));
+    monsters.push(new Monster(W / 2 + 100, 240, currentLevel));
+    monsters.push(new Monster(80, 180, currentLevel));
+    monsters.push(new Monster(W - 140, 180, currentLevel));
+    monsters.push(new Monster(170, 120, currentLevel));
+    monsters.push(new Monster(W - 230, 120, currentLevel));
+    monsters.push(new Monster(W / 2 - 30, groundHeight, currentLevel));
+}
+
+// ========== 房间生成调度 ==========
+const roomGenerators = [
+    generateRoom1,
+    generateRoom2,
+    generateRoom3,
+    generateRoom4,
+    generateRoom5,
+    generateRoom6,
+    generateRoom7,
+    generateRoom8,
+    generateRoom9,
+    generateRoom10
+];
+
+function generateRoom(level) {
+    if (level >= 1 && level <= MAX_LEVEL) {
+        roomGenerators[level - 1]();
+    }
+}
+
+// ========== 地图刷新 ==========
+function updateLevelDisplay() {
+    document.getElementById('level-info').textContent =
+        `关卡: ${currentLevel} / ${MAX_LEVEL}`;
+}
+
+function refreshMap() {
+    clearMap();
+    currentLevel++;
+
+    if (currentLevel > MAX_LEVEL) {
+        showVictory();
+        return;
+    }
+
+    updateLevelDisplay();
+    generateRoom(currentLevel);
+}
+
+// ========== 胜利 & 重开 ==========
+function showVictory() {
+    document.getElementById('victory-screen').classList.remove('hidden');
+    document.getElementById('victory-screen').classList.add('active');
+}
+
+function restartGame() {
+    document.getElementById('victory-screen').classList.remove('active');
+    document.getElementById('victory-screen').classList.add('hidden');
+
+    clearMap();
+    playerHealth = maxHealth;
+    currentLevel = 0;
+    x = 200;
+    y = 0;
+    vy = 0;
+    updateHealthDisplay();
+    updateLevelDisplay();
+    refreshMap();
 }
 
 // ========== 主循环 ==========
 function loop() {
+    // 胜利界面激活时不处理游戏逻辑
+    if (document.getElementById('victory-screen').classList.contains('active')) {
+        requestAnimationFrame(loop);
+        return;
+    }
+
     // 移动
     if (keys.a) { x -= speed; faceDir = -1; }
     if (keys.d) { x += speed; faceDir = 1; }
@@ -196,7 +395,6 @@ function loop() {
         // 天空怪不参与地面接触伤害
         if (m.type === 'sky') continue;
 
-        // 玩家受伤检测
         const pRect = player.getBoundingClientRect();
         const mRect = m.element.getBoundingClientRect();
         const now = Date.now();
@@ -220,7 +418,7 @@ function loop() {
         let drop = drops[i];
         const pRect = player.getBoundingClientRect();
         const dRect = drop.element.getBoundingClientRect();
-        
+
         if (
             pRect.left < dRect.right &&
             pRect.right > dRect.left &&
@@ -253,17 +451,14 @@ function loop() {
     // 渲染
     player.style.left = x + 'px';
     player.style.bottom = groundHeight + y + 'px';
-
-    // 默认给玩家赋予待机类名
     player.className = 'idle';
-    // 根据面朝方向水平翻转（因为原图缩放了0.3，所以X轴缩放要乘以0.3）
     player.style.transform = `scaleX(${faceDir * 0.3}) scaleY(0.3)`;
 
     requestAnimationFrame(loop);
 }
 
 // ========== 启动游戏 ==========
-// 初始化开始界面
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initStartScreen();
+    document.getElementById('restart-btn').addEventListener('click', restartGame);
 });
