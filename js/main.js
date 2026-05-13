@@ -100,16 +100,6 @@ function clearPlatforms() {
     platforms = [];
 }
 
-// 按关卡随机怪物类型
-function rollMonsterType(level) {
-    if (level <= 2) return 'patrol';
-    const pool = ['patrol'];
-    if (level >= 3) pool.push('chase', 'chase');
-    if (level >= 4) pool.push('tank');
-    if (level >= 5) pool.push('sky');
-    return pool[Math.floor(Math.random() * pool.length)];
-}
-
 function clearMap() {
     clearPlatforms();
     if (portal) { portal.remove(); portal = null; }
@@ -119,13 +109,43 @@ function clearMap() {
     drops = [];
 }
 
+// 将平台上的怪物绑定到对应平台边界，不在平台上的空中怪物落回地面
+function bindMonstersToPlatforms() {
+    for (let m of monsters) {
+        // 天空怪强制飞到高处
+        if (m.type === 'sky') {
+            m.y = window.innerHeight * 0.75;
+            m.element.style.bottom = m.y + 'px';
+            continue;
+        }
+        const mBottom = m.y;
+        const mLeft = m.x;
+        const mRight = m.x + m.cfg.w;
+        let foundPlatform = false;
+        for (let p of platforms) {
+            const pTop = p.y + p.h;
+            if (Math.abs(mBottom - pTop) < 5 &&
+                mRight > p.x && mLeft < p.x + p.w) {
+                m.setBounds(p.x, p.x + p.w - m.cfg.w);
+                foundPlatform = true;
+                break;
+            }
+        }
+        // 不在任何平台上且高于地面 → 掉到地面
+        if (!foundPlatform && mBottom > groundHeight) {
+            m.y = groundHeight;
+            m.element.style.bottom = groundHeight + 'px';
+        }
+    }
+}
+
 // ========== 10个房间生成函数 ==========
 
 // 第1关：入门关 — 平坦地面，2只怪物
 function generateRoom1() {
     let positions = [200, window.innerWidth - 260];
     for (let px of positions) {
-        monsters.push(new Monster(px, groundHeight, currentLevel));
+        monsters.push(new Monster(px, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
     }
 }
 
@@ -134,9 +154,9 @@ function generateRoom2() {
     const W = window.innerWidth;
     addPlatform(100, 150, 120, 20);
     addPlatform(W - 220, 150, 120, 20);
-    monsters.push(new Monster(80, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, 170, currentLevel));
-    monsters.push(new Monster(W - 140, groundHeight, currentLevel));
+    monsters.push(new Monster(80, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, 170, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 140, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第3关：阶梯平台 — 3个不同高度平台，4只怪物
@@ -145,10 +165,10 @@ function generateRoom3() {
     addPlatform(50, 130, 100, 20);
     addPlatform(W / 2 - 60, 180, 120, 20);
     addPlatform(W - 150, 230, 100, 20);
-    monsters.push(new Monster(60, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 - 20, 200, currentLevel));
-    monsters.push(new Monster(W / 2 + 30, 250, currentLevel));
-    monsters.push(new Monster(W - 100, groundHeight, currentLevel));
+    monsters.push(new Monster(60, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 20, 200, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 30, 250, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 100, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第4关：多层平台 — 两侧低中间高，5只怪物
@@ -158,11 +178,11 @@ function generateRoom4() {
     addPlatform(W / 2 - 60, 200, 120, 20);
     addPlatform(W / 2 + 60, 140, 100, 20);
     addPlatform(W / 2 - 60, 260, 120, 20);
-    monsters.push(new Monster(80, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, 160, currentLevel));
-    monsters.push(new Monster(W / 2, 220, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, 280, currentLevel));
-    monsters.push(new Monster(W - 140, groundHeight, currentLevel));
+    monsters.push(new Monster(80, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, 160, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2, 220, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, 280, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 140, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第5关：裂谷 — 中间断开需跳跃，6只怪物
@@ -171,12 +191,12 @@ function generateRoom5() {
     addPlatform(80, 130, 150, 20);
     addPlatform(W - 230, 130, 150, 20);
     addPlatform(W / 2 - 50, 190, 100, 20);
-    monsters.push(new Monster(100, 150, currentLevel));
-    monsters.push(new Monster(200, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 - 20, 210, currentLevel));
-    monsters.push(new Monster(W / 2 + 20, groundHeight, currentLevel));
-    monsters.push(new Monster(W - 200, 150, currentLevel));
-    monsters.push(new Monster(W - 100, groundHeight, currentLevel));
+    monsters.push(new Monster(100, 150, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(200, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 20, 210, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 20, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 200, 150, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 100, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第6关：双层结构 — 上下两层平台，6只怪物
@@ -187,12 +207,12 @@ function generateRoom6() {
     addPlatform(100, 200, 150, 20);
     addPlatform(W / 2 - 75, 200, 150, 20);
     addPlatform(W - 250, 200, 150, 20);
-    monsters.push(new Monster(80, 140, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, 220, currentLevel));
-    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel));
-    monsters.push(new Monster(W - 200, 220, currentLevel));
-    monsters.push(new Monster(W - 80, 140, currentLevel));
-    monsters.push(new Monster(W / 2 - 40, groundHeight, currentLevel));
+    monsters.push(new Monster(80, 140, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, 220, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 200, 220, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 80, 140, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 40, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第7关：浮空岛群 — 多个分散小平台，7只怪物
@@ -204,13 +224,13 @@ function generateRoom7() {
     addPlatform(W / 2 - 40, 200, 80, 20);
     addPlatform(W - 280, 160, 80, 20);
     addPlatform(W - 140, 100, 80, 20);
-    monsters.push(new Monster(80, 120, currentLevel));
-    monsters.push(new Monster(220, 180, currentLevel));
-    monsters.push(new Monster(380, 140, currentLevel));
-    monsters.push(new Monster(W / 2, 220, currentLevel));
-    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel));
-    monsters.push(new Monster(W - 260, 180, currentLevel));
-    monsters.push(new Monster(W - 120, 120, currentLevel));
+    monsters.push(new Monster(80, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(220, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(380, 140, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2, 220, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 30, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 260, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 120, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第8关：高塔 — 多层堆叠，7只怪物
@@ -222,13 +242,13 @@ function generateRoom8() {
     addPlatform(W / 2 - 10, 120, 100, 20);
     addPlatform(W / 2 + 10, 180, 100, 20);
     addPlatform(W / 2 + 30, 240, 100, 20);
-    monsters.push(new Monster(W / 2 - 130, 140, currentLevel));
-    monsters.push(new Monster(W / 2 - 100, 200, currentLevel));
-    monsters.push(new Monster(W / 2 - 70, 260, currentLevel));
-    monsters.push(new Monster(60, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 + 80, 200, currentLevel));
-    monsters.push(new Monster(W / 2 + 60, 260, currentLevel));
-    monsters.push(new Monster(W - 120, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 130, 140, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 100, 200, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 70, 260, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(60, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 80, 200, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 60, 260, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 120, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第9关：竞技场 — 四角 + 中央平台，8只怪物
@@ -239,14 +259,14 @@ function generateRoom9() {
     addPlatform(40, 220, 80, 20);
     addPlatform(W - 120, 220, 80, 20);
     addPlatform(W / 2 - 100, 160, 200, 20);
-    monsters.push(new Monster(60, 120, currentLevel));
-    monsters.push(new Monster(60, 240, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, 180, currentLevel));
-    monsters.push(new Monster(W / 2 + 30, 180, currentLevel));
-    monsters.push(new Monster(W - 100, 120, currentLevel));
-    monsters.push(new Monster(W - 100, 240, currentLevel));
-    monsters.push(new Monster(W / 2 - 80, groundHeight, currentLevel));
-    monsters.push(new Monster(W / 2 + 80, groundHeight, currentLevel));
+    monsters.push(new Monster(60, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(60, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 30, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 100, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 100, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 80, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 80, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // 第10关：最终关 — 对称多层布局，8只怪物满配
@@ -259,14 +279,14 @@ function generateRoom10() {
     addPlatform(W - 180, 160, 120, 20);
     addPlatform(150, 100, 100, 20);
     addPlatform(W - 250, 100, 100, 20);
-    monsters.push(new Monster(W / 2 - 20, 300, currentLevel));
-    monsters.push(new Monster(W / 2 - 140, 240, currentLevel));
-    monsters.push(new Monster(W / 2 + 100, 240, currentLevel));
-    monsters.push(new Monster(80, 180, currentLevel));
-    monsters.push(new Monster(W - 140, 180, currentLevel));
-    monsters.push(new Monster(170, 120, currentLevel));
-    monsters.push(new Monster(W - 230, 120, currentLevel));
-    monsters.push(new Monster(W / 2 - 30, groundHeight, currentLevel));
+    monsters.push(new Monster(W / 2 - 20, 300, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 140, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 + 100, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(80, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 140, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(170, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W - 230, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    monsters.push(new Monster(W / 2 - 30, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
 // ========== 房间生成调度 ==========
@@ -306,6 +326,7 @@ function refreshMap() {
 
     updateLevelDisplay();
     generateRoom(currentLevel);
+    bindMonstersToPlatforms();
 }
 
 // ========== 胜利 & 重开 ==========
@@ -351,7 +372,8 @@ function loop() {
         isOnGround = false;
     }
 
-    // 重力
+    // 重力（先存上一帧位置用于平台碰撞检测）
+    const prevPlayerBottom = groundHeight + y;
     vy -= gravity;
     y += vy;
 
@@ -365,7 +387,6 @@ function loop() {
     // 平台碰撞
     let onPlatform = false;
     const playerBottom = groundHeight + y;
-    const playerTop = playerBottom + 50;
 
     for (const plat of platforms) {
         const platLeft = plat.x;
@@ -375,13 +396,14 @@ function loop() {
         if (
             (x + 30) > platLeft &&
             x < platRight &&
-            playerTop >= platTop &&
+            prevPlayerBottom >= platTop &&
             playerBottom <= platTop &&
             vy <= 0
         ) {
             y = platTop - groundHeight;
             vy = 0;
             onPlatform = true;
+            break;
         }
     }
 
@@ -390,7 +412,27 @@ function loop() {
     // 怪物移动 + 碰撞伤害
     for (let i = 0; i < monsters.length; i++) {
         let m = monsters[i];
-        m.update();
+        m.update(x, groundHeight + y, player);
+
+        // 天空怪蓄力攻击判定（与地面接触伤害分开处理）
+        if (m.type === 'sky' && m.state === 'charge' && m.chargeReady && m.warningZone) {
+            const pRect = player.getBoundingClientRect();
+            const wRect = m.warningZone.getBoundingClientRect();
+            const now = Date.now();
+            if (
+                pRect.left < wRect.right &&
+                pRect.right > wRect.left &&
+                pRect.top < wRect.bottom &&
+                pRect.bottom > wRect.top
+            ) {
+                if (now - lastDamageTime >= damageCooldown) {
+                    playerHealth = Math.max(0, playerHealth - 2);
+                    lastDamageTime = now;
+                    updateHealthDisplay();
+                }
+            }
+            m.finishCharge();
+        }
 
         // 天空怪不参与地面接触伤害
         if (m.type === 'sky') continue;
