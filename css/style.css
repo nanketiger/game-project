@@ -176,15 +176,15 @@ body {
 
 /* 开始界面样式 下面这些*/
 .screen {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100; /* 界面层级，确保在游戏元素之上 */
+    z-index: 100;
 }
 
 /* 天空背景（100px以上区域） */
@@ -195,7 +195,7 @@ body {
     width: 100%;
     height: calc(100% - 100px);
     background: url('../images/地图天空背景.png') no-repeat center center;
-    background-size: cover;
+    background-size: 100% 100%;
     z-index: 0;
 }
 
@@ -207,7 +207,7 @@ body {
     width: 100%;
     height: 100px;
     background: url('../images/地图地面背景.png') no-repeat center center;
-    background-size: cover;
+    background-size: 100% 100%;
     z-index: 0;
 }
 
@@ -221,7 +221,7 @@ body {
 
 #start-screen {
     background: url('../images/bg.png') no-repeat center center;
-    background-size: cover; /* 让图片等比例缩放铺满整个屏幕 */
+    background-size: 100% 100%; /* 让图片等比例缩放铺满整个屏幕 */
     color: white;
     font-family: Arial, sans-serif;
 }
