@@ -59,10 +59,14 @@ function setupBackpackEvents() {
     const backpackScreen = document.getElementById('backpack-screen');
     const closeBtn = document.getElementById('close-backpack');
 
-    // B键打开背包
+    // B键切换背包
     document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'b' && !backpackScreen.classList.contains('active')) {
-            openBackpack();
+        if (e.key.toLowerCase() === 'b') {
+            if (backpackScreen.classList.contains('active')) {
+                closeBackpack();
+            } else {
+                openBackpack();
+            }
         }
     });
 

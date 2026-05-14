@@ -74,7 +74,7 @@ body {
     background: #000;
     border-radius: 50%;
     position: absolute;
-    z-index: 110;
+    z-index: 10;
 }
 
 
@@ -102,7 +102,7 @@ body {
     position: absolute; /* 绝对定位，用于放置传送门 */
     border-radius: 40px; /* 圆角边框，形成椭圆形传送门效果 */
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), inset 0 0 20px #000;
-    z-index: 110;
+    z-index: 10;
     animation: portalPulse 1.5s ease-in-out infinite alternate;
     display: flex;
     justify-content: center;
@@ -133,7 +133,7 @@ body {
     box-shadow: 0 0 10px #DDA0DD;
     pointer-events: none;
     opacity: 0;
-    z-index: 111;
+    z-index: 11;
 }
 
 @keyframes portalSwirl {
@@ -185,6 +185,11 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 100;
+}
+
+/* 游戏容器层级（低于子弹/传送门，高于body背景） */
+#game-container {
+    z-index: 0;
 }
 
 /* 天空背景（100px以上区域） */
@@ -560,7 +565,7 @@ body {
     position: absolute;
     box-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500; /* 发光特效 */
     transform: rotate(45deg); /* 旋转成菱形晶体 */
-    z-index: 110;
+    z-index: 10;
     animation: floatAnim 1s ease-in-out infinite alternate;
 }
 
