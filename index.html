@@ -28,6 +28,10 @@
   <div id="pause-screen" class="screen hidden">
     <div class="pause-content">
       <h1>游戏暂停</h1>
+      <div class="volume-control">
+        <img class="volume-icon" src="images/ui/音效图标.png" alt="音量">
+        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="50">
+      </div>
       <button id="resume-btn" class="start-button">返回游戏</button>
       <button id="menu-btn" class="start-button">回到主菜单</button>
     </div>
@@ -53,6 +57,8 @@
       A/D 移动 | K 跳跃 | J 射击 | B背包
     </div>
   </div>
+
+  <audio id="bgm" src="sound/game.wav" loop preload="auto"></audio>
 
   <script src="js/bag.js"></script>
   <script src="js/utils.js"></script>

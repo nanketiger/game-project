@@ -557,6 +557,23 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('resume-btn').addEventListener('click', resumeGame);
     document.getElementById('menu-btn').addEventListener('click', returnToMenu);
 
+    // 音量控制
+    const bgm = document.getElementById('bgm');
+    const volumeSlider = document.getElementById('volume-slider');
+    const savedVolume = localStorage.getItem('bgmVolume');
+    if (savedVolume !== null) {
+        bgm.volume = parseFloat(savedVolume);
+        volumeSlider.value = Math.round(bgm.volume * 100);
+    } else {
+        bgm.volume = 0.5;
+        volumeSlider.value = 50;
+    }
+    volumeSlider.addEventListener('input', () => {
+        const vol = volumeSlider.value / 100;
+        bgm.volume = vol;
+        localStorage.setItem('bgmVolume', vol);
+    });
+
     // ESC 暂停
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') togglePause();

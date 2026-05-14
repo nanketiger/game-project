@@ -622,6 +622,62 @@ body {
     margin-bottom: 15px;
 }
 
+/* 音量控制 */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.volume-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+.volume-slider {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #8A2BE2;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #8A2BE2;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+    cursor: pointer;
+}
+
 /* 掉落物上下悬浮的动画 */
 @keyframes floatAnim {
     0% { transform: rotate(45deg) translateY(0px); }

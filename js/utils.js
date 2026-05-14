@@ -155,21 +155,33 @@ function initStartScreen() {
     const startBtn = document.getElementById('start-btn');
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
-    
+
     startBtn.addEventListener('click', startGame);
-    
+
     // 添加键盘支持（按空格或回车开始游戏）
     document.addEventListener('keydown', (e) => {
         if ((e.key === ' ' || e.key === 'Enter') && startScreen.classList.contains('active')) {
             startGame();
         }
     });
+
+    // 首次用户交互时启动音乐（主界面即开始播放）
+    const bgm = document.getElementById('bgm');
+    function tryPlayBgm() {
+        if (bgm && bgm.paused) bgm.play().catch(() => {});
+    }
+    document.addEventListener('click', tryPlayBgm, { once: true });
+    document.addEventListener('keydown', tryPlayBgm, { once: true });
 }
 
 function startGame() {
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
-    
+
+    // 启动背景音乐
+    const bgm = document.getElementById('bgm');
+    if (bgm && bgm.paused) bgm.play().catch(() => {});
+
     // 切换屏幕显示
     startScreen.classList.remove('active');
     startScreen.classList.add('hidden');
