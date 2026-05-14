@@ -69,21 +69,14 @@ body {
 */
 /* 子弹样式 */
 .bullet {
-    width: 8px; /* 子弹宽度 */
-    height: 8px; /* 子弹高度 */
-    background: #000; /* 黑色子弹 */
-    border-radius: 50%; /* 圆形子弹 */
-    position: absolute; /* 绝对定位，用于子弹飞行 */
+    width: 8px;
+    height: 8px;
+    background: #000;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 110;
 }
 
-/* 地面样式 */
-.ground {
-    width: 100%; /* 地面宽度占满屏幕 */
-    height: 100px; /* 地面高度 */
-    background: #567D46; /* 深绿色地面 */
-    position: absolute; /* 绝对定位 */
-    bottom: 0; /* 位于屏幕底部 */
-}
 
 /* 平台样式 */
 .platform {
@@ -109,7 +102,7 @@ body {
     position: absolute; /* 绝对定位，用于放置传送门 */
     border-radius: 40px; /* 圆角边框，形成椭圆形传送门效果 */
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), inset 0 0 20px #000;
-    z-index: 5; /* 传送门层级 */
+    z-index: 110;
     animation: portalPulse 1.5s ease-in-out infinite alternate;
     display: flex;
     justify-content: center;
@@ -140,7 +133,7 @@ body {
     box-shadow: 0 0 10px #DDA0DD;
     pointer-events: none;
     opacity: 0;
-    z-index: 6;
+    z-index: 111;
 }
 
 @keyframes portalSwirl {
@@ -192,6 +185,30 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 100; /* 界面层级，确保在游戏元素之上 */
+}
+
+/* 天空背景（100px以上区域） */
+.sky-background {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 100px);
+    background: url('../images/地图天空背景.png') no-repeat center center;
+    background-size: cover;
+    z-index: 0;
+}
+
+/* 地面背景（100px以下区域） */
+.ground-background {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: url('../images/地图地面背景.png') no-repeat center center;
+    background-size: cover;
+    z-index: 0;
 }
 
 .hidden {
@@ -543,7 +560,7 @@ body {
     position: absolute;
     box-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500; /* 发光特效 */
     transform: rotate(45deg); /* 旋转成菱形晶体 */
-    z-index: 4;
+    z-index: 110;
     animation: floatAnim 1s ease-in-out infinite alternate;
 }
 
