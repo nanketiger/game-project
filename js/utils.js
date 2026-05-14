@@ -97,9 +97,9 @@ function shoot(direction = 'horizontal') {
                 if (m.takeDamage(bulletDamage, knockbackDir)) {
                     monsters.splice(i, 1); // 怪物死亡，从数组中移除
                     
-                    // 当数组清空（怪物全灭）且传送门没出现时，生成传送门
-                    if (monsters.length === 0 && !portal) {
-                        createPortal();
+                    // 当数组清空（怪物全灭）且传送门没出现时，弹出遗物选择
+                    if (monsters.length === 0 && !portal && !isRelicSelecting) {
+                        showRelicSelection();
                     }
                 }
                 return; // 子弹穿透取消，打中就消失

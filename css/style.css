@@ -498,3 +498,90 @@ body {
     pointer-events: none;
     z-index: 5;
 }
+
+/* ================= 遗物选择界面 ================= */
+#relic-screen {
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 150;
+}
+
+.relic-container {
+    width: 85vw;
+    max-width: 1000px;
+    padding: 40px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(138, 43, 226, 0.5);
+    box-shadow: 0 0 60px rgba(138, 43, 226, 0.4);
+}
+
+.relic-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.relic-header h2 {
+    font-size: 38px;
+    color: #FFD700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    margin-bottom: 8px;
+}
+
+.relic-subtitle {
+    font-size: 16px;
+    color: #bdc3c7;
+}
+
+.relic-cards {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.relic-card {
+    flex: 1;
+    min-width: 200px;
+    max-width: 280px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: 2px solid #34495e;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.relic-card:hover {
+    border-color: #FFD700;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(138, 43, 226, 0.5);
+}
+
+.relic-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #8A2BE2, #4B0082);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #FFD700;
+    border: 2px solid rgba(255, 215, 0, 0.4);
+}
+
+.relic-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ecf0f1;
+    margin-bottom: 10px;
+}
+
+.relic-desc {
+    font-size: 14px;
+    color: #95a5a6;
+    line-height: 1.5;
+}

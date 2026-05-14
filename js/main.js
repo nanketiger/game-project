@@ -340,6 +340,7 @@ function restartGame() {
     document.getElementById('victory-screen').classList.add('hidden');
 
     clearMap();
+    clearRelics();
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -352,8 +353,9 @@ function restartGame() {
 
 // ========== 主循环 ==========
 function loop() {
-    // 胜利界面激活时不处理游戏逻辑
-    if (document.getElementById('victory-screen').classList.contains('active')) {
+    // 胜利界面或遗物选择激活时不处理游戏逻辑
+    if (document.getElementById('victory-screen').classList.contains('active') ||
+        isRelicSelecting) {
         requestAnimationFrame(loop);
         return;
     }
