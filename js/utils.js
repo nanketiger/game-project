@@ -181,15 +181,21 @@ function startGame() {
 }
 
 function initGame() {
+    // 取消旧的动画循环（防止重复启动导致加速）
+    if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+    }
+
     // 重置游戏状态
     playerHealth = maxHealth;
-    currentLevel = 0; // 设为0，因为下面调用 refreshMap 时会自动 +1
-    
+    currentLevel = 0;
+
     updateHealthDisplay();
-    
+
     // 统一使用 refreshMap() 来初始化地图和生成第一波怪物
-    refreshMap(); 
-    
+    refreshMap();
+
     // 开始游戏循环
     loop();
 }

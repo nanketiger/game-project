@@ -594,6 +594,34 @@ body {
     margin-bottom: 30px;
 }
 
+/* 暂停界面 */
+#pause-screen {
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 130;
+}
+
+.pause-content {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.9), rgba(20, 20, 40, 0.95));
+    padding: 50px 60px;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.pause-content h1 {
+    font-size: 42px;
+    color: #ecf0f1;
+    margin-bottom: 40px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.pause-content .start-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
 /* 掉落物上下悬浮的动画 */
 @keyframes floatAnim {
     0% { transform: rotate(45deg) translateY(0px); }

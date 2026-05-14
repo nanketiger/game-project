@@ -30,6 +30,12 @@ let drops = [];
 const MAX_LEVEL = 10;
 let currentLevel = 1;
 
+// 暂停
+let isPaused = false;
+
+// 动画帧 ID（防止重复启动 loop）
+let animFrameId = null;
+
 // 传送门
 let portal = null;
 let portalX = 0;
@@ -329,6 +335,48 @@ function refreshMap() {
     bindMonstersToPlatforms();
 }
 
+// ========== 暂停 ==========
+function togglePause() {
+    // 选择遗物或胜利时不响应暂停
+    if (isRelicSelecting || document.getElementById('victory-screen').classList.contains('active')) return;
+
+    isPaused = !isPaused;
+    if (isPaused) {
+        document.getElementById('pause-screen').classList.remove('hidden');
+        document.getElementById('pause-screen').classList.add('active');
+    } else {
+        document.getElementById('pause-screen').classList.remove('active');
+        document.getElementById('pause-screen').classList.add('hidden');
+    }
+}
+
+function resumeGame() {
+    isPaused = false;
+    document.getElementById('pause-screen').classList.remove('active');
+    document.getElementById('pause-screen').classList.add('hidden');
+}
+
+function returnToMenu() {
+    isPaused = false;
+    document.getElementById('pause-screen').classList.remove('active');
+    document.getElementById('pause-screen').classList.add('hidden');
+    document.getElementById('game-container').classList.remove('active');
+    document.getElementById('game-container').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    document.getElementById('start-screen').classList.add('active');
+
+    clearMap();
+    clearRelics();
+    clearBackpackItems();
+    playerHealth = maxHealth;
+    currentLevel = 0;
+    x = 200;
+    y = 0;
+    vy = 0;
+    updateHealthDisplay();
+    updateLevelDisplay();
+}
+
 // ========== 胜利 & 重开 ==========
 function showVictory() {
     document.getElementById('victory-screen').classList.remove('hidden');
@@ -354,10 +402,10 @@ function restartGame() {
 
 // ========== 主循环 ==========
 function loop() {
-    // 胜利界面或遗物选择激活时不处理游戏逻辑
+    // 胜利界面、遗物选择或暂停激活时不处理游戏逻辑
     if (document.getElementById('victory-screen').classList.contains('active') ||
-        isRelicSelecting) {
-        requestAnimationFrame(loop);
+        isRelicSelecting || isPaused) {
+        animFrameId = requestAnimationFrame(loop);
         return;
     }
 
@@ -499,11 +547,18 @@ function loop() {
     player.className = 'idle';
     player.style.transform = `scaleX(${faceDir * 0.6}) scaleY(0.6)`;
 
-    requestAnimationFrame(loop);
+    animFrameId = requestAnimationFrame(loop);
 }
 
 // ========== 启动游戏 ==========
 document.addEventListener('DOMContentLoaded', function () {
     initStartScreen();
     document.getElementById('restart-btn').addEventListener('click', restartGame);
+    document.getElementById('resume-btn').addEventListener('click', resumeGame);
+    document.getElementById('menu-btn').addEventListener('click', returnToMenu);
+
+    // ESC 暂停
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') togglePause();
+    });
 });
