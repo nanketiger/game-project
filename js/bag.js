@@ -1,6 +1,7 @@
 // 背包系统 - bag.js
 
-let isBackpackOpen = false; // 背包是否打开
+let isBackpackOpen = false;
+let backpackItems = {}; // { itemName: { count, color } }
 
 // 初始化背包系统
 function initBackpack() {
@@ -20,29 +21,36 @@ function createBackpackUI() {
                 <button id="close-backpack" class="close-btn">×</button>
             </div>
             <div class="backpack-content">
-                <div class="backpack-grid-container">
-                    <div class="backpack-grid">
-                        ${Array.from({length: 20}, (_, i) => `
-                            <div class="backpack-slot" data-index="${i}">
-                                <div class="slot-empty">空</div>
-                            </div>
-                        `).join('')}
+                <div class="backpack-left">
+                    <div class="backpack-grid-container">
+                        <div class="backpack-grid" id="backpack-grid">
+                            ${Array.from({length: 20}, (_, i) => `
+                                <div class="backpack-slot" data-slot="${i}">
+                                    <div class="slot-empty">空</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="backpack-relics">
+                        <div class="relics-label">战利品</div>
+                        <div class="relics-row" id="items-row">
+                            <span class="relics-empty">暂无物品</span>
+                        </div>
                     </div>
                 </div>
-                <div class="item-details">
+                <div class="item-details" id="detail-panel">
                     <div class="item-preview">
                         <h3 class="preview-name">背包详情</h3>
                     </div>
-                    <div class="item-description">
-                        <p>这是一个空的背包界面</p>
+                    <div class="item-description" id="detail-text">
+                        <p>点击遗物或战利品查看详情</p>
                         <p>格子数量：20</p>
-                        <p>点击左侧格子可以选中</p>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(backpackScreen);
 }
 
@@ -50,123 +58,169 @@ function createBackpackUI() {
 function setupBackpackEvents() {
     const backpackScreen = document.getElementById('backpack-screen');
     const closeBtn = document.getElementById('close-backpack');
-    const slots = document.querySelectorAll('.backpack-slot');
-    
+
     // B键打开背包
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'b' && !backpackScreen.classList.contains('active')) {
             openBackpack();
         }
     });
-    
+
     // 关闭背包
     closeBtn.addEventListener('click', closeBackpack);
-    
-    // 格子点击事件
-    slots.forEach(slot => {
-        slot.addEventListener('click', () => {
-            const index = parseInt(slot.dataset.index);
-            selectSlot(index);
-        });
-    });
 }
 
 // 打开背包
 function openBackpack() {
     const backpackScreen = document.getElementById('backpack-screen');
     const gameContainer = document.getElementById('game-container');
-    
+
     backpackScreen.classList.remove('hidden');
     backpackScreen.classList.add('active');
     gameContainer.classList.add('paused');
-    
+
     isBackpackOpen = true;
-    
-    // 重置选中状态
+
+    refreshRelicDisplay();
+    refreshItemDisplay();
     selectSlot(-1);
+    resetDetailPanel();
 }
 
 // 关闭背包
 function closeBackpack() {
     const backpackScreen = document.getElementById('backpack-screen');
     const gameContainer = document.getElementById('game-container');
-    
+
     backpackScreen.classList.remove('active');
     backpackScreen.classList.add('hidden');
     gameContainer.classList.remove('paused');
-    
+
     isBackpackOpen = false;
 }
 
-// 选择格子
+// 选中格子
 function selectSlot(index) {
     const slots = document.querySelectorAll('.backpack-slot');
-    
-    // 移除之前的选中状态
-    slots.forEach(slot => slot.classList.remove('selected'));
-    
-    if (index >= 0) {
-        // 选中格子
+    slots.forEach(s => s.classList.remove('selected'));
+
+    if (index >= 0 && index < slots.length) {
         slots[index].classList.add('selected');
     }
 }
 
-// 初始化背包系统
-document.addEventListener('DOMContentLoaded', function() {
-    initBackpack();
-});
+// ========== 遗物展示（格子区） ==========
 
-// 支持物品叠加的拾取逻辑
-function addItemToBackpack(itemName, color = '#FFD700') {
+function refreshRelicDisplay() {
     const slots = document.querySelectorAll('.backpack-slot');
-    let firstEmptySlot = null;
+    // 全部清空
+    slots.forEach(s => {
+        s.innerHTML = '<div class="slot-empty">空</div>';
+        delete s.dataset.relicId;
+        s.onclick = null;
+    });
 
-    // 1. 第一轮遍历：先查找是否已经有同名物品
-    for (let i = 0; i < slots.length; i++) {
+    // 填充遗物
+    selectedRelics.forEach((rid, i) => {
+        if (i >= slots.length) return;
+        const relic = getRelicById(rid);
+        if (!relic) return;
+
         const slot = slots[i];
-        
-        // 如果发现同名物品，直接叠加数量！
-        if (slot.dataset.item === itemName) {
-            // 获取当前数量，如果没有记录则默认为 1
-            let count = parseInt(slot.dataset.count || 1);
-            count++;
-            slot.dataset.count = count; // 更新数据
-            
-            // 更新 UI，在名字后面加上数量 (比如 x2, x3)
-            const nameSpan = slot.querySelector('.item-name');
-            if (nameSpan) {
-                nameSpan.textContent = `${itemName} x${count}`;
-            }
-            
-            // 顺便给个被拾取堆叠时的放大闪烁反馈（可选）
-            slot.style.transform = 'scale(1.1)';
-            setTimeout(() => slot.style.transform = '', 150);
-            
-            return true; // 叠加成功，拾取结束
-        }
-        
-        // 顺便记录一下遇到的第一个空格子，供下面第 2 步使用
-        if (!firstEmptySlot && slot.querySelector('.slot-empty')) {
-            firstEmptySlot = slot;
-        }
-    }
-
-    // 2. 如果背包里没有同名物品，且有空格子，则占个新位置
-    if (firstEmptySlot) {
-        firstEmptySlot.innerHTML = `
+        slot.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center;">
-                <div style="width:16px; height:16px; background:${color}; transform:rotate(45deg); box-shadow:0 0 10px ${color}; margin-bottom:8px;"></div>
-                <!-- 加上 class="item-name" 方便上面叠加时去修改文字 -->
-                <span class="item-name" style="font-size:12px; color:#fff;">${itemName} x1</span>
+                <div class="relic-slot-icon">${relic.name.charAt(0)}</div>
+                <span class="item-name" style="font-size:11px; color:#FFD700;">${relic.name}</span>
             </div>
         `;
-        // 给格子打上标记：存了什么物品、存了几个
-        firstEmptySlot.dataset.item = itemName;
-        firstEmptySlot.dataset.count = 1; 
-        
-        return true; // 占位成功
-    }
-    
-    console.log("背包满了！");
-    return false; // 既没有同名物品，也没有空位，拾取失败
+        slot.dataset.relicId = rid;
+
+        slot.addEventListener('click', () => {
+            document.querySelectorAll('.backpack-relic-slot').forEach(r => r.classList.remove('selected'));
+            selectSlot(i);
+            showRelicDetail(relic);
+        });
+    });
 }
+
+// ========== 战利品展示（底部栏） ==========
+
+function refreshItemDisplay() {
+    const row = document.getElementById('items-row');
+    if (!row) return;
+    row.innerHTML = '';
+
+    const itemNames = Object.keys(backpackItems);
+    if (itemNames.length === 0) {
+        row.innerHTML = '<span class="relics-empty">暂无物品</span>';
+        return;
+    }
+
+    itemNames.forEach(name => {
+        const data = backpackItems[name];
+        const slot = document.createElement('div');
+        slot.className = 'backpack-relic-slot';
+        slot.innerHTML = `
+            <div style="width:16px; height:16px; background:${data.color}; transform:rotate(45deg); box-shadow:0 0 6px ${data.color}; flex-shrink:0;"></div>
+            <span class="relic-slot-name">${name} x${data.count}</span>
+        `;
+        slot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.backpack-slot').forEach(s => s.classList.remove('selected'));
+            document.querySelectorAll('.backpack-relic-slot').forEach(r => r.classList.remove('selected'));
+            slot.classList.add('selected');
+            showItemDetail(name, data);
+        });
+        row.appendChild(slot);
+    });
+}
+
+// ========== 详情面板 ==========
+
+function showRelicDetail(relic) {
+    const nameEl = document.querySelector('#detail-panel .preview-name');
+    const descEl = document.getElementById('detail-text');
+    nameEl.textContent = relic.name;
+    descEl.innerHTML = `
+        <p class="relic-detail-effect">${relic.desc}</p>
+        <div class="relic-detail-story">${relic.story}</div>
+    `;
+}
+
+function showItemDetail(name, data) {
+    const nameEl = document.querySelector('#detail-panel .preview-name');
+    const descEl = document.getElementById('detail-text');
+    nameEl.textContent = name;
+    descEl.innerHTML = `
+        <p style="font-size:16px; color:#fff;">数量：${data.count}</p>
+        <p style="font-size:14px; color:#95a5a6;">击杀怪物的战利品，可用于后续合成或兑换。</p>
+    `;
+}
+
+function resetDetailPanel() {
+    const nameEl = document.querySelector('#detail-panel .preview-name');
+    const descEl = document.getElementById('detail-text');
+    nameEl.textContent = '背包详情';
+    descEl.innerHTML = '<p>点击遗物或战利品查看详情</p><p>格子数量：20</p>';
+}
+
+// ========== 拾取逻辑 ==========
+
+function addItemToBackpack(itemName, color = '#FFD700') {
+    if (backpackItems[itemName]) {
+        backpackItems[itemName].count++;
+    } else {
+        backpackItems[itemName] = { count: 1, color };
+    }
+    return true;
+}
+
+// 清空背包（游戏重开时调用）
+function clearBackpackItems() {
+    backpackItems = {};
+}
+
+// ========== 初始化 ==========
+document.addEventListener('DOMContentLoaded', function () {
+    initBackpack();
+});

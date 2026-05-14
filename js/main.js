@@ -341,6 +341,7 @@ function restartGame() {
 
     clearMap();
     clearRelics();
+    clearBackpackItems();
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
