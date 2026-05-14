@@ -4,10 +4,10 @@ const groundHeight = 100;
 
 let x = 200;
 let y = 0;
-const speed = 3.5;
-const jumpPower = 20;
+const speed = 2.5;
+const jumpPower = 12;
 let vy = 0;
-const gravity = 0.5;
+const gravity = 0.3;
 let isOnGround = false;
 
 // 血量
@@ -491,10 +491,10 @@ function loop() {
     }
 
     // 渲染
-    player.style.left = x + 'px';
+    player.style.left = (x - 60) + 'px';
     player.style.bottom = groundHeight + y + 'px';
     player.className = 'idle';
-    player.style.transform = `scaleX(${faceDir * 0.3}) scaleY(0.3)`;
+    player.style.transform = `scaleX(${faceDir * 0.6}) scaleY(0.6)`;
 
     requestAnimationFrame(loop);
 }

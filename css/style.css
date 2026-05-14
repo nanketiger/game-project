@@ -15,9 +15,7 @@ body {
 /* 玩家样式 */
 #player {
     position: absolute;
-    transform: scale(0.4);       
-    transform-origin: bottom center; 
-    
+    transform-origin: center bottom;
 }
 #player.idle {
     width: 150px;               

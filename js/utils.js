@@ -28,7 +28,7 @@ function shoot(direction = 'horizontal') {
 
     const b = document.createElement('div');
     b.className = 'bullet';
-    b.style.left = x + 15 + 'px';
+    b.style.left = (x + 15 + faceDir * 30) + 'px';
     b.style.bottom = groundHeight + y + 25 + 'px';
     document.body.appendChild(b);
 
@@ -38,29 +38,29 @@ function shoot(direction = 'horizontal') {
     
     switch(direction) {
         case 'up':
-            bulletSpeedY = 8; // 向上射击
+            bulletSpeedY = 5;
             break;
         case 'up-right':
-            bulletSpeedX = 8; // 向右上角射击
-            bulletSpeedY = 8;
+            bulletSpeedX = 5;
+            bulletSpeedY = 5;
             break;
         case 'up-left':
-            bulletSpeedX = -8; // 向左上角射击
-            bulletSpeedY = 8;
+            bulletSpeedX = -5;
+            bulletSpeedY = 5;
             break;
         case 'down':
-            bulletSpeedY = -8; // 向下射击
+            bulletSpeedY = -5;
             break;
         case 'down-right':
-            bulletSpeedX = 8; // 向右下角射击
-            bulletSpeedY = -8;
+            bulletSpeedX = 5;
+            bulletSpeedY = -5;
             break;
         case 'down-left':
-            bulletSpeedX = -8; // 向左下角射击
-            bulletSpeedY = -8;
+            bulletSpeedX = -5;
+            bulletSpeedY = -5;
             break;
-        default: // 水平射击
-            bulletSpeedX = 8 * faceDir;
+        default:
+            bulletSpeedX = 5 * faceDir;
             break;
     }
 

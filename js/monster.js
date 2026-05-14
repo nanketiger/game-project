@@ -8,7 +8,7 @@ const MONSTER_CONFIG = {
     },
     chase: {
         color: '#FF4444', w: 45, h: 75,
-        hpMult: 3, speedMult: 1.5,
+        hpMult: 3, speedMult: 0.9,
         drop: '赤怪碎片', dropColor: '#FF6B6B',
         detectRange: 200, knockback: 15
     },
