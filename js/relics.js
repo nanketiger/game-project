@@ -9,10 +9,11 @@ const RELICS = [
     {
         //很多遗物的function实现还没写，而且遗物名字功能都是乱写的，可以随意更改
         id: 1,
-        name: '力量护符',
-        desc: '子弹伤害 +1',
-        story: '一枚古老的铜质护符，表面刻着早已失传的战士符文。握在手中时，能感受到一股温热的力量顺着指尖流向武器，让每一击都更加沉重有力。',
-        apply: function () { bulletDamage += 1; }
+        name: '大口径枪口',
+        desc: '子弹伤害 ×4',
+        icon: 'images/遗物图标/1大口径枪管.png',
+        story: '一根经过精密锻造的强化枪管，内壁刻有螺旋膛线，比普通枪管粗了整整一圈。将它替换到武器上后，子弹在膛内获得更长的加速距离和更高的膛压，出膛时的动能被放大数倍——命中目标的瞬间，威力如同被巨锤砸中。',
+        apply: function () { bulletDamage *= 4; }
     },
     {
         id: 2,
@@ -39,8 +40,9 @@ const RELICS = [
         id: 5,
         name: '铁壁护盾',
         desc: '受伤后无敌时间翻倍',
+        icon: 'images/遗物图标/5铁壁护盾.png',
         story: '一面由矮人工艺打造的微型塔盾，虽然只有手掌大小，却蕴含着大地之灵的庇护。受到攻击后，它会释放一层肉眼难见的能量护盾，为持有者争取喘息的时间。',
-        apply: function () { /* 需调整 damageCooldown */ }
+        apply: function () { damageCooldown *= 2; }
     },
     {
         id: 6,
@@ -72,10 +74,11 @@ const RELICS = [
     },
     {
         id: 10,
-        name: '分身之镜',
+        name: '双射管',
         desc: '每次射击多发射一颗子弹',
-        story: '一面刻着对称符文的银镜，映出的不是倒影而是另一个自己。当持有者扣动扳机时，镜子中的幻影也会做出相同的动作，让子弹凭空多出一颗。',
-        apply: function () { /* 效果在 shoot 时触发 */ }
+        icon: 'images/遗物图标/10双射管.png',
+        story: '一种特殊的Y形枪管附件，能将单发子弹在出膛前分裂为两枚独立的弹丸。内部精密的导流槽确保两枚子弹保持相同的弹道和速度。虽然增加了弹药消耗，但双倍的弹幕意味着双倍的压制力。',
+        apply: function () { /* 效果在 shoot 时触发，检查 selectedRelics.includes(10) */ }
     },
     {
         id: 11,
@@ -86,10 +89,11 @@ const RELICS = [
     },
     {
         id: 12,
-        name: '凤凰羽毛',
+        name: '重启芯片',
         desc: '死亡时复活一次（恢复 50% 生命）',
-        story: '一根金红交织的华丽羽毛，在黑暗中会隐隐发光。传说凤凰在烈火中涅槃重生，而这根羽毛承载了它的一缕不朽之力——在持有者濒死之际，燃起重生之火。',
-        apply: function () { /* 效果在玩家死亡时触发 */ }
+        icon: 'images/遗物图标/12重启芯片.png',
+        story: '一枚嵌在微型电路板上的银色芯片，表面蚀刻着不断循环的箭头图案。它是某个失落科技的遗存——当持有者生命体征消失的瞬间，芯片会释放出强大的纳米修复脉冲，将肉体从崩溃边缘拉回。但每枚芯片的能量只够使用一次。',
+        apply: function () { hasRevive = true; }
     },
     {
         id: 13,
@@ -114,10 +118,11 @@ const RELICS = [
     },
     {
         id: 16,
-        name: '圣光之戒',
+        name: '治疗仪',
         desc: '每进入新关卡恢复 5 点生命',
-        story: '一枚散发着柔和白光的戒指，戒面镶嵌着一颗纯洁无瑕的钻石。它曾属于一位以治愈之力闻名大陆的圣骑士，佩戴者踏入新的领域时，会感受到神圣的祝福抚平伤口。',
-        apply: function () { /* 效果在 refreshMap 时触发 */ }
+        icon: 'images/遗物图标/16治疗仪.png',
+        story: '一台便携式医疗设备，外壳上有一个醒目的红十字标记。它能自动检测使用者的生命体征，在进入新环境时释放一股温和的再生射线，加速细胞分裂和伤口愈合。虽然单次治疗量有限，但在漫长的冒险中能持续提供稳定的恢复。',
+        apply: function () { /* 效果在 refreshMap 时触发，检查 selectedRelics.includes(16) */ }
     },
     {
         id: 17,
@@ -201,8 +206,11 @@ function showRelicSelection() {
     picks.forEach(relic => {
         const card = document.createElement('div');
         card.className = 'relic-card';
+        const iconHtml = relic.icon
+            ? `<img class="relic-icon-img" src="${relic.icon}" alt="${relic.name}">`
+            : `<div class="relic-icon">${relic.name.charAt(0)}</div>`;
         card.innerHTML = `
-            <div class="relic-icon">${relic.name.charAt(0)}</div>
+            ${iconHtml}
             <div class="relic-name">${relic.name}</div>
             <div class="relic-desc">${relic.desc}</div>
         `;

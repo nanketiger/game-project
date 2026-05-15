@@ -33,6 +33,9 @@ let currentLevel = 1;
 // 暂停
 let isPaused = false;
 
+// 复活芯片
+let hasRevive = false;
+
 // 动画帧 ID（防止重复启动 loop）
 let animFrameId = null;
 
@@ -333,6 +336,12 @@ function refreshMap() {
     updateLevelDisplay();
     generateRoom(currentLevel);
     bindMonstersToPlatforms();
+
+    // 治疗仪：每进入新关卡恢复 5 点生命
+    if (selectedRelics.includes(16)) {
+        playerHealth = Math.min(maxHealth, playerHealth + 5);
+        updateHealthDisplay();
+    }
 }
 
 // ========== 暂停 ==========
@@ -368,6 +377,7 @@ function returnToMenu() {
     clearMap();
     clearRelics();
     clearBackpackItems();
+    hasRevive = false;
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -390,6 +400,7 @@ function restartGame() {
     clearMap();
     clearRelics();
     clearBackpackItems();
+    hasRevive = false;
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -504,6 +515,13 @@ function loop() {
                 updateHealthDisplay();
             }
         }
+    }
+
+    // 复活芯片判定
+    if (playerHealth <= 0 && hasRevive) {
+        playerHealth = Math.floor(maxHealth * 0.5);
+        hasRevive = false;
+        updateHealthDisplay();
     }
 
     // 拾取掉落物检测

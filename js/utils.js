@@ -111,6 +111,52 @@ function shoot(direction = 'horizontal') {
         else requestAnimationFrame(move);
     }
     move();
+
+    // 双射管：额外发射一颗子弹
+    if (selectedRelics.includes(10)) {
+        const b2 = document.createElement('div');
+        b2.className = 'bullet';
+        b2.style.left = (x + 15 + faceDir * 30) + 'px';
+        b2.style.bottom = groundHeight + y + 35 + 'px';
+        document.body.appendChild(b2);
+
+        const sx = bulletSpeedX;
+        const sy = bulletSpeedY;
+        function move2() {
+            if (!b2.parentNode) return;
+            let l = parseFloat(b2.style.left);
+            let t = parseFloat(b2.style.bottom);
+            l += sx;
+            t += sy;
+            b2.style.left = l + 'px';
+            b2.style.bottom = t + 'px';
+
+            for (let i = monsters.length - 1; i >= 0; i--) {
+                let m = monsters[i];
+                const bulletRect = b2.getBoundingClientRect();
+                const monsterRect = m.element.getBoundingClientRect();
+                if (
+                    bulletRect.left < monsterRect.right &&
+                    bulletRect.right > monsterRect.left &&
+                    bulletRect.top < monsterRect.bottom &&
+                    bulletRect.bottom > monsterRect.top
+                ) {
+                    b2.remove();
+                    let knockbackDir = sx !== 0 ? Math.sign(sx) : faceDir;
+                    if (m.takeDamage(bulletDamage, knockbackDir)) {
+                        monsters.splice(i, 1);
+                        if (monsters.length === 0 && !portal && !isRelicSelecting) {
+                            showRelicSelection();
+                        }
+                    }
+                    return;
+                }
+            }
+            if (l < 0 || l > innerWidth || t > innerHeight) b2.remove();
+            else requestAnimationFrame(move2);
+        }
+        move2();
+    }
 }
 
 // 射击控制 - 支持按键组合

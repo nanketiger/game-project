@@ -131,9 +131,12 @@ function refreshRelicDisplay() {
         if (!relic) return;
 
         const slot = slots[i];
+        const iconHtml = relic.icon
+            ? `<img class="relic-slot-img" src="${relic.icon}" alt="${relic.name}">`
+            : `<div class="relic-slot-icon">${relic.name.charAt(0)}</div>`;
         slot.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center;">
-                <div class="relic-slot-icon">${relic.name.charAt(0)}</div>
+                ${iconHtml}
                 <span class="item-name" style="font-size:11px; color:#FFD700;">${relic.name}</span>
             </div>
         `;

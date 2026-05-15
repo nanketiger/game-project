@@ -776,6 +776,23 @@ body {
     border: 2px solid rgba(255, 215, 0, 0.4);
 }
 
+.relic-icon-img {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 215, 0, 0.4);
+}
+
+/* 背包格子内遗物图片 */
+.relic-slot-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    margin-bottom: 2px;
+}
+
 .relic-name {
     font-size: 20px;
     font-weight: bold;
