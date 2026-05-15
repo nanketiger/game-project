@@ -3,11 +3,11 @@ const keys = {};
 
 // 射击冷却
 let lastShootTime = 0;
-const shootCooldown = 500;
+let shootCooldown = 500;
 
 // 角色伤害冷却
 let lastDamageTime = 0;
-const damageCooldown = 1000;
+let damageCooldown = 1000;
 
 // 面向方向
 let faceDir = 1;

@@ -4,15 +4,15 @@ const groundHeight = 100;
 
 let x = 200;
 let y = 0;
-const speed = 2.5;
-const jumpPower = 12;
+let speed = 2.5;
+let jumpPower = 12;
 let vy = 0;
-const gravity = 0.3;
+let gravity = 0.3;
 let isOnGround = false;
 
 // 血量
 let playerHealth = 100;
-const maxHealth = 100;
+let maxHealth = 100;
 
 // 子弹伤害
 let bulletDamage = 100;
