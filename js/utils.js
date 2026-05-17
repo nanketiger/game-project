@@ -9,6 +9,9 @@ let shootCooldown = 500;
 let lastDamageTime = 0;
 let damageCooldown = 1000;
 
+// 人物缩放倍率（统一全局控制尺寸和碰撞、子弹位置，默认为1.5）
+let playerScale = 1.5;
+
 // 面向方向
 let faceDir = 1;
 
@@ -26,10 +29,20 @@ function shoot(direction = 'horizontal') {
     if (currentTime - lastShootTime < shootCooldown) return;
     lastShootTime = currentTime;
 
-    const b = document.createElement('div');
+    // 延迟200毫秒再射出子弹配合射击动画
+    setTimeout(() => {
+        // 先检查一下容器还在不在激活状态，防止切页面时射子弹
+        if (!document.getElementById('game-container').classList.contains('active')) return;
+
+        const b = document.createElement('div');
     b.className = 'bullet';
-    b.style.left = (x + 15 + faceDir * 30) + 'px';
-    b.style.bottom = groundHeight + y + 25 + 'px';
+    
+    // 子弹发射位置随 playerScale 动态计算（解决修改尺寸后错位问题）
+    // 基础中心 x 轴约在人物正中 (x + 15)，再加上面朝方向的枪管偏移 (faceDir * 35 * playerScale)
+    b.style.left = (x + 15 + faceDir * 35 * playerScale) + 'px';
+    // 垂直高度底盘加上 (35 * playerScale) 使得刚好从手的位置出枪
+    b.style.bottom = (groundHeight + y + 45 * playerScale) + 'px';
+    
     document.body.appendChild(b);
 
     // 根据方向设置子弹速度
@@ -116,8 +129,9 @@ function shoot(direction = 'horizontal') {
     if (selectedRelics.includes(10)) {
         const b2 = document.createElement('div');
         b2.className = 'bullet';
-        b2.style.left = (x + 15 + faceDir * 30) + 'px';
-        b2.style.bottom = groundHeight + y + 35 + 'px';
+        // 第二发子弹随 playerScale 动态计算位置（高度略高）
+        b2.style.left = (x + 15 + faceDir * 35 * playerScale) + 'px';
+        b2.style.bottom = (groundHeight + y + 35 * playerScale) + 'px';
         document.body.appendChild(b2);
 
         const sx = bulletSpeedX;
@@ -157,6 +171,7 @@ function shoot(direction = 'horizontal') {
         }
         move2();
     }
+    }, 200); // 延迟结束
 }
 
 // 射击控制 - 支持按键组合

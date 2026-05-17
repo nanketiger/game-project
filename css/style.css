@@ -18,16 +18,53 @@ body {
     transform-origin: center bottom;
 }
 #player.idle {
-    width: 150px;               
-    height: 143px;
-    background-image: url('../images/idle3.png'); 
-    background-size: 900px 143px; 
-    animation: idle-anim 3s steps(5) infinite; 
+    width: 128px;               
+    height: 128px;
+    background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_2/Idle.png'); 
+    background-size: 1152px 128px; 
+    animation: idle-anim 1s steps(9) infinite; 
 }
 @keyframes idle-anim {
     from { background-position: 0px 0px; }
-    /* 图片总宽是 900px，向左移动到 -900px 刚好播完完整的 6 帧 */
-    to { background-position: -900px 0px; } 
+    /* 图片总宽是 1152px (9帧) */
+    to { background-position: -1152px 0px; } 
+}
+
+#player.running {
+    width: 128px;               
+    height: 128px;
+    background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_2/Run.png'); 
+    background-size: 1024px 128px; 
+    animation: run-anim 0.8s steps(8) infinite; 
+}
+@keyframes run-anim {
+    from { background-position: 0px 0px; }
+    /* 图片总宽是 1024px (8帧) */
+    to { background-position: -1024px 0px; } 
+}
+
+#player.shooting {
+    width: 128px;               
+    height: 128px;
+    background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_2/Shot_1.png'); 
+    background-size: 512px 128px; 
+    /* 射击动作时长改为0.2秒 */
+    animation: shoot-anim 0.2s steps(4) forwards; 
+}
+
+/* 跳跃状态：通过静态帧来替代没有的跳跃动作图，并停止切帧模拟动作锁定 */
+#player.jumping {
+    width: 128px;               
+    height: 128px;
+    background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_2/Idle.png'); 
+    background-size: 1152px 128px; 
+    /* 强行锁死在第二帧（-256px）展示在空中的感觉，不配置 animation 使其动作冻结 */
+    background-position: -256px 0px; 
+}
+@keyframes shoot-anim {
+    from { background-position: 0px 0px; }
+    /* 图片总宽是 512px (4帧) */
+    to { background-position: -512px 0px; } 
 }
 
 /* #player 的基础毛坯代码保持不变（负责位置、初始大小） 
@@ -199,7 +236,7 @@ body {
     left: 0;
     width: 100%;
     height: calc(100% - 100px);
-    background: url('../images/地图天空背景.png') no-repeat center center;
+    background: url('../images/内部背景2.png') no-repeat center center;
     background-size: 100% 100%;
     z-index: 0;
 }

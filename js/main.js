@@ -562,8 +562,23 @@ function loop() {
     // 渲染
     player.style.left = (x - 60) + 'px';
     player.style.bottom = groundHeight + y + 'px';
-    player.className = 'idle';
-    player.style.transform = `scaleX(${faceDir * 0.6}) scaleY(0.6)`;
+    
+    // 获取当前时间，判断是否处于射击动作窗口（射击动作播放 200 毫秒）
+    const isNowShooting = Date.now() - lastShootTime < 200;
+
+    // 根据按键状态切换动画，射击动作拥有最高优先级
+    if (isNowShooting) {
+        player.className = 'shooting';
+    } else if (!isOnGround) {
+        player.className = 'jumping'; // 当处于空中时，锁定为跳跃状态（防止播放跑步等地面动画）
+    } else if (keys.a || keys.d) {
+        player.className = 'running';
+    } else {
+        player.className = 'idle';
+    }
+    
+    // 调用 utils.js 中统一声明的 playerScale 来等比例缩放人物大小
+    player.style.transform = `scaleX(${faceDir * playerScale}) scaleY(${playerScale})`;
 
     animFrameId = requestAnimationFrame(loop);
 }
