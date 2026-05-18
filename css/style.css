@@ -35,7 +35,7 @@ body {
     height: 128px;
     background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_2/Run.png'); 
     background-size: 1024px 128px; 
-    animation: run-anim 0.8s steps(8) infinite; 
+    animation: run-anim 0.6s steps(8) infinite; 
 }
 @keyframes run-anim {
     from { background-position: 0px 0px; }
@@ -60,6 +60,21 @@ body {
     background-size: 1152px 128px; 
     /* 强行锁死在第二帧（-256px）展示在空中的感觉，不配置 animation 使其动作冻结 */
     background-position: -256px 0px; 
+}
+
+/* 死亡状态 */
+#player.dead {
+    width: 128px;               
+    height: 128px;
+    background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_1/Dead.png'); 
+    background-size: 512px 128px; 
+    /* 死亡动作包含4帧图片：改为 steps(3) 并位移到 -384px 才能完美停在最后一帧 */
+    animation: dead-anim 0.5s steps(3) forwards; 
+}
+@keyframes dead-anim {
+    from { background-position: 0px 0px; }
+    /* 图片总宽是 512px，倒数第一帧的位置是 -(512-128) = -384px */
+    to { background-position: -384px 0px; } 
 }
 @keyframes shoot-anim {
     from { background-position: 0px 0px; }

@@ -176,6 +176,10 @@ function shoot(direction = 'horizontal') {
 
 // 射击控制 - 支持按键组合
 document.addEventListener('keydown', e => {
+    // 已经死亡或者在暂停/胜利界面不允许射击
+    if (typeof isDead !== 'undefined' && isDead) return;
+    if (document.getElementById('victory-screen').classList.contains('active')) return;
+
     const key = e.key.toLowerCase();
     
     if (key === 'j') {

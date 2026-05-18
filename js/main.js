@@ -13,6 +13,7 @@ let isOnGround = false;
 // 血量
 let playerHealth = 100;
 let maxHealth = 100;
+let isDead = false; // 是否死亡状态
 
 // 子弹伤害
 let bulletDamage = 100;
@@ -378,6 +379,7 @@ function returnToMenu() {
     clearRelics();
     clearBackpackItems();
     hasRevive = false;
+    isDead = false;
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -420,16 +422,18 @@ function loop() {
         return;
     }
 
-    // 移动
-    if (keys.a) { x -= speed; faceDir = -1; }
-    if (keys.d) { x += speed; faceDir = 1; }
+    // 移动（仅在没死的情况下可以操作）
+    if (!isDead) {
+        if (keys.a) { x -= speed; faceDir = -1; }
+        if (keys.d) { x += speed; faceDir = 1; }
+    }
 
     // 边界
     const playerWidth = 30;
     x = Math.max(0, Math.min(x, window.innerWidth - playerWidth));
 
-    // 跳跃
-    if (keys.k && isOnGround) {
+    // 跳跃（仅在没死的情况下可以操作）
+    if (!isDead && keys.k && isOnGround) {
         vy = jumpPower;
         isOnGround = false;
     }
@@ -524,6 +528,16 @@ function loop() {
         updateHealthDisplay();
     }
 
+    if (playerHealth <= 0 && !hasRevive && !isDead) {
+        playerHealth = 0;
+        isDead = true;
+        // 延迟一点时间显示重新开始（可以复用回到主菜单，或者其他界面），这里暂时先弹窗并回主菜单
+        setTimeout(() => {
+            alert('你已经死了，游戏结束！');
+            returnToMenu();
+        }, 1500);
+    }
+
     // 拾取掉落物检测
     for (let i = drops.length - 1; i >= 0; i--) {
         let drop = drops[i];
@@ -566,8 +580,10 @@ function loop() {
     // 获取当前时间，判断是否处于射击动作窗口（射击动作播放 200 毫秒）
     const isNowShooting = Date.now() - lastShootTime < 200;
 
-    // 根据按键状态切换动画，射击动作拥有最高优先级
-    if (isNowShooting) {
+    // 根据按键状态切换动画，优先级：死亡 > 射击 > 跳跃 > 跑动 > 待机
+    if (isDead) {
+        player.className = 'dead';
+    } else if (isNowShooting) {
         player.className = 'shooting';
     } else if (!isOnGround) {
         player.className = 'jumping'; // 当处于空中时，锁定为跳跃状态（防止播放跑步等地面动画）
