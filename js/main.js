@@ -113,7 +113,7 @@ function clearPlatforms() {
 function clearMap() {
     clearPlatforms();
     if (portal) { portal.remove(); portal = null; }
-    monsters.forEach(m => m.element.remove());
+    monsters.forEach(m => { m.element.remove(); m.hpBarContainer.remove(); });
     monsters = [];
     drops.forEach(d => d.element.remove());
     drops = [];
@@ -136,7 +136,13 @@ function bindMonstersToPlatforms() {
             const pTop = p.y + p.h;
             if (Math.abs(mBottom - pTop) < 5 &&
                 mRight > p.x && mLeft < p.x + p.w) {
-                m.setBounds(p.x, p.x + p.w - m.cfg.w);
+                if (p.w >= m.cfg.w) {
+                    m.setBounds(p.x, p.x + p.w - m.cfg.w);
+                } else {
+                    // 平台太窄：将怪物固定在平台中央，防止边界振荡"两张贴图"
+                    const cx = p.x + (p.w - m.cfg.w) / 2;
+                    m.setBounds(cx, cx);
+                }
                 foundPlatform = true;
                 break;
             }
