@@ -24,17 +24,19 @@ const RELICS = [
     },
     {
         id: 3,
-        name: '吸血之戒',
+        name: '吸血芯片',
         desc: '击杀怪物恢复 1 点生命',
-        story: '这枚暗红色的戒指内侧刻着一圈细密的獠牙状纹路。传说它由一位吸血鬼伯爵的血液淬炼而成，能将敌人的生命力抽取并转移给佩戴者。',
-        apply: function () { /* 效果在怪物死亡时触发 */ }
+        icon: 'images/遗物图标/3吸血芯片.png',
+        story: '一枚植入式生物芯片，表面密布着微小的纳米针管。当佩戴者击杀敌人时，芯片会瞬间释放电脉冲激活血液中的纳米机器人，将敌人的残余生命力转化为使用者的自愈能量。',
+        apply: function () { /* 效果在 monster.takeDamage 死亡时触发 */ }
     },
     {
         id: 4,
-        name: '时光沙漏',
+        name: '时空碎片',
         desc: '射击间隔减少 150ms',
-        story: '一个精致的小沙漏，里面的银沙永远在流动却永远不会落尽。触碰它的人会感觉周围的时间变慢了，手上的动作却变得更加迅捷流畅。',
-        apply: function () { /* 需调整 shootCooldown */ }
+        icon: 'images/遗物图标/4时空碎片.png',
+        story: '一块散发着淡蓝色荧光的晶体碎片，触摸时周围的空气会微微扭曲。它是某个破裂时空装置的残骸——持有者周围的时间流速略微加快，使得拉栓、装填、瞄准的动作比常人快了整整一拍。',
+        apply: function () { shootCooldown = Math.max(100, shootCooldown - 150); }
     },
     {
         id: 5,
@@ -67,10 +69,11 @@ const RELICS = [
     },
     {
         id: 9,
-        name: '磁铁护符',
+        name: '收获钩锁',
         desc: '自动拾取掉落物范围增大',
-        story: '一块天然的磁石打磨成的护符，对金属以外的物质也有奇异的吸引力。佩戴它的人仿佛拥有了无形的引力场，散落的物品会自动向手心聚拢。',
-        apply: function () { /* 效果在拾取判定时触发 */ }
+        icon: 'images/遗物图标/9收获钩锁.png',
+        story: '一把带有能量牵引装置的便携钩锁，能够发射无形的引力光束。当使用者靠近战利品时，钩锁会自动射出磁化绳索将物品拉回——再也不用冒着危险冲进敌群中去捡东西了。',
+        apply: function () { /* 效果在 loop 拾取判定时增大检测范围 */ }
     },
     {
         id: 10,
@@ -82,10 +85,13 @@ const RELICS = [
     },
     {
         id: 11,
-        name: '冰霜之心',
+        name: '冰霜核心',
         desc: '所有怪物移动速度降低 30%',
-        story: '一颗永远寒冷的蓝宝石，散发着淡淡的冰雾。据说它来自极北冰原深处的万年冰窟，散发的寒气能让敌人的关节僵硬、行动迟缓。',
-        apply: function () { /* 需修改怪物 speed */ }
+        icon: 'images/遗物图标/11冰霜核心.png',
+        story: '一个拳头大小的球形装置，核心处有一颗不断旋转的蓝色晶体，散发着刺骨的寒气。启动后它会持续释放低温能量场，周围的空气瞬间凝结成白雾——敌人的关节在这极寒中变得迟缓僵硬，行动速度大幅降低。',
+        apply: function () {
+            monsters.forEach(m => { m.speed *= 0.7; });
+        }
     },
     {
         id: 12,
@@ -97,10 +103,11 @@ const RELICS = [
     },
     {
         id: 13,
-        name: '暴击之星',
+        name: '暴击之芯',
         desc: '15% 概率造成双倍伤害',
-        story: '一颗五角星形状的奇异宝石，边缘锐利如刃。它的星光忽明忽暗，仿佛在低语着运气的秘密。佩戴它的人偶尔会在攻击时爆发出远超平日的力量。',
-        apply: function () { /* 效果在 takeDamage 时触发 */ }
+        icon: 'images/遗物图标/13暴击之芯.png',
+        story: '一颗不稳定的能量核心，内部涌动着躁动的红色脉冲光。每次射击时它都有小概率释放出一股失控的能量洪流，让子弹的破坏力瞬间翻倍——虽然触发不稳定，但一旦发动就是一记毁灭性的打击。',
+        apply: function () { /* 效果在 shoot 击中时触发 */ }
     },
     {
         id: 14,
@@ -111,10 +118,11 @@ const RELICS = [
     },
     {
         id: 15,
-        name: '重力石',
-        desc: '跳跃高度降低，但滞空时间更长',
-        story: '一块来自天外的陨铁，漆黑如夜却轻得令人意外。它扭曲了周围的引力场，让持有者的身体变得轻盈飘逸，每一次腾空都如同在月球上漫步。',
-        apply: function () { /* 需调整 jumpPower 和 gravity */ }
+        name: '无人机',
+        desc: '滞空时间更长',
+        icon: 'images/遗物图标/15无人机.png',
+        story: '一架巴掌大小的微型无人机，配备了反重力推进器。它会自动悬浮在使用者身旁，持续投射一个重力抵消力场——虽然不会让你跳得更高，但每一次腾空后都能像羽毛般缓缓飘落。',
+        apply: function () { gravity = Math.max(0.05, gravity - 0.15); }
     },
     {
         id: 16,
@@ -126,17 +134,19 @@ const RELICS = [
     },
     {
         id: 17,
-        name: '猎人印记',
+        name: '瞄准镜',
         desc: '对满血怪物造成的伤害翻倍',
-        story: '猎人行会颁发的精英徽章，上面刻着一只瞄准猎物的鹰。佩戴这枚徽章的人会获得猎人的直觉——在敌人毫无防备时，一击制胜。',
-        apply: function () { /* 效果在 takeDamage 时触发 */ }
+        icon: 'images/遗物图标/17瞄准镜.png',
+        story: '一个全息投影战术瞄准镜，能自动扫描敌人的生物特征并在视野中标出薄弱环节。当敌人处于完好状态时，瞄准镜会高亮其致命弱点——第一枪精准命中要害，造成的伤害远超普通射击。',
+        apply: function () { /* 效果在 takeDamage 时触发，满血怪物受双倍伤害 */ }
     },
     {
         id: 18,
-        name: '金币袋',
-        desc: '每关额外获得一个随机掉落物',
-        story: '一个沉甸甸的小布袋，虽然看起来不大，里面却装满了来自各个世界的奇珍异宝。每当你征服一个关卡，袋子就会自动吐出一份意外的惊喜。',
-        apply: function () { /* 效果在怪物全灭时触发 */ }
+        name: '刷新遥控',
+        desc: '之后每次遗物选择可以重投一次',
+        icon: 'images/遗物图标/18刷新遥控.png',
+        story: '一个带有红色大按钮的遥控器，按钮上方印着"REFRESH"字样。按下按钮的瞬间，遥控器会发射一道量子纠缠信号，扭曲因果律使得眼前的选择被重新排列——机会从来不止一次，但记得只能用一次。',
+        apply: function () { /* 效果在 showRelicSelection 时提供重投按钮 */ }
     },
     {
         id: 19,
@@ -187,22 +197,18 @@ function createRelicSelectionUI() {
                 <p class="relic-subtitle">击败所有怪物，选择一份力量</p>
             </div>
             <div class="relic-cards" id="relic-cards"></div>
+            <div class="relic-reroll" id="relic-reroll" style="display:none;">
+                <button id="reroll-btn" class="start-button">重投一次</button>
+            </div>
         </div>
     `;
     document.body.appendChild(screen);
     return screen;
 }
 
-function showRelicSelection() {
-    isRelicSelecting = true;
-
-    let screen = document.getElementById('relic-screen');
-    if (!screen) screen = createRelicSelectionUI();
-
+function renderRelicCards(picks, screen) {
     const cardsContainer = document.getElementById('relic-cards');
     cardsContainer.innerHTML = '';
-
-    const picks = getRandomRelics(3);
     picks.forEach(relic => {
         const card = document.createElement('div');
         card.className = 'relic-card';
@@ -217,6 +223,30 @@ function showRelicSelection() {
         card.addEventListener('click', () => selectRelic(relic, screen));
         cardsContainer.appendChild(card);
     });
+}
+
+function showRelicSelection() {
+    isRelicSelecting = true;
+
+    let screen = document.getElementById('relic-screen');
+    if (!screen) screen = createRelicSelectionUI();
+
+    const picks = getRandomRelics(3);
+    renderRelicCards(picks, screen);
+
+    // 刷新遥控：显示重投按钮
+    const rerollDiv = document.getElementById('relic-reroll');
+    if (rerollDiv && selectedRelics.includes(18)) {
+        rerollDiv.style.display = 'block';
+        const rerollBtn = document.getElementById('reroll-btn');
+        rerollBtn.onclick = () => {
+            const newPicks = getRandomRelics(3);
+            renderRelicCards(newPicks, screen);
+            rerollDiv.style.display = 'none'; // 只能重投一次
+        };
+    } else if (rerollDiv) {
+        rerollDiv.style.display = 'none';
+    }
 
     screen.classList.remove('hidden');
     screen.classList.add('active');

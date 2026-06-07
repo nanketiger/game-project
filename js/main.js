@@ -550,11 +550,13 @@ function loop() {
         const pRect = player.getBoundingClientRect();
         const dRect = drop.element.getBoundingClientRect();
 
+        // 收获钩锁：拾取范围扩大 50px
+        const pickupMargin = selectedRelics.includes(9) ? 50 : 0;
         if (
-            pRect.left < dRect.right &&
-            pRect.right > dRect.left &&
-            pRect.top < dRect.bottom &&
-            pRect.bottom > dRect.top
+            (pRect.left - pickupMargin) < (dRect.right + pickupMargin) &&
+            (pRect.right + pickupMargin) > (dRect.left - pickupMargin) &&
+            (pRect.top - pickupMargin) < (dRect.bottom + pickupMargin) &&
+            (pRect.bottom + pickupMargin) > (dRect.top - pickupMargin)
         ) {
             // 拾取成功：先尝试放进背包
             if (addItemToBackpack(drop.itemName || '紫怪核心', drop.dropColor || '#FFD700')) {

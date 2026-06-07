@@ -71,6 +71,8 @@ class Monster {
         this.maxHealth = cfg.hpMult * level;
         this.health = this.maxHealth;
         this.speed = (0.8 + Math.random() * 0.8) * cfg.speedMult * 0.8;
+        // 冰霜核心：所有怪物移速降低 30%
+        if (selectedRelics.includes(11)) this.speed *= 0.7;
         this.direction = Math.random() > 0.5 ? 1 : -1;
 
         // ================= 状态机核心属性 =================
@@ -322,6 +324,11 @@ class Monster {
     takeDamage(amount, knockbackDir = 0) {
         if (this.state === 'dead') return false;
 
+        // 瞄准镜：对满血怪物伤害翻倍
+        if (selectedRelics.includes(17) && this.health === this.maxHealth) amount *= 2;
+        // 暴击之芯：15% 概率双倍伤害
+        if (selectedRelics.includes(13) && Math.random() < 0.15) amount *= 2;
+
         this.health -= amount;
 
         // 血条更新
@@ -346,6 +353,11 @@ class Monster {
                 this.element.style.backgroundImage = 'url(' + deathSprite.src + ')';
                 this.element.style.backgroundSize = (deathSprite.w * scale) + 'px ' + (deathSprite.h * scale) + 'px';
                 this.element.style.backgroundPosition = '0 0';
+            }
+            // 吸血芯片：击杀恢复 1 点生命
+            if (selectedRelics.includes(3)) {
+                playerHealth = Math.min(maxHealth, playerHealth + 1);
+                updateHealthDisplay();
             }
             // 怪物死亡瞬间，在原地爆出战利品
             const dropY = this.type === 'sky' ? this.groundHeight : this.y;
