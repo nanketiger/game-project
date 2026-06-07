@@ -588,7 +588,7 @@ function loop() {
     // 渲染
     player.style.left = (x - 60) + 'px';
     player.style.bottom = groundHeight + y + 'px';
-    
+
     // 获取当前时间，判断是否处于射击动作窗口（射击动作播放 200 毫秒）
     const isNowShooting = Date.now() - lastShootTime < 200;
 
