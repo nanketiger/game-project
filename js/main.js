@@ -391,6 +391,8 @@ function returnToMenu() {
     x = 200;
     y = 0;
     vy = 0;
+    gravity = 0.3;
+    jumpPower = 12;
     updateHealthDisplay();
     updateLevelDisplay();
 }
@@ -414,6 +416,8 @@ function restartGame() {
     x = 200;
     y = 0;
     vy = 0;
+    gravity = 0.3;
+    jumpPower = 12;
     updateHealthDisplay();
     updateLevelDisplay();
     refreshMap();

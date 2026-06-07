@@ -122,7 +122,10 @@ const RELICS = [
         desc: '滞空时间更长',
         icon: 'images/遗物图标/15无人机.png',
         story: '一架巴掌大小的微型无人机，配备了反重力推进器。它会自动悬浮在使用者身旁，持续投射一个重力抵消力场——虽然不会让你跳得更高，但每一次腾空后都能像羽毛般缓缓飘落。',
-        apply: function () { gravity = Math.max(0.05, gravity - 0.15); }
+        apply: function () {
+            gravity = Math.max(0.05, gravity - 0.15);
+            jumpPower = Math.sqrt(jumpPower * jumpPower * gravity / (gravity + 0.15));
+        }
     },
     {
         id: 16,
