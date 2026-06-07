@@ -40,6 +40,10 @@ let hasRevive = false;
 // 动画帧 ID（防止重复启动 loop）
 let animFrameId = null;
 
+// 房间开始倒计时（怪物延迟激活）
+let monstersActive = true;
+let roomStartTimer = null;
+
 // 传送门
 let portal = null;
 let portalX = 0;
@@ -344,6 +348,14 @@ function refreshMap() {
     generateRoom(currentLevel);
     bindMonstersToPlatforms();
 
+    // 房间开始 2 秒内怪物不激活
+    monstersActive = false;
+    if (roomStartTimer) clearTimeout(roomStartTimer);
+    roomStartTimer = setTimeout(() => {
+        monstersActive = true;
+        roomStartTimer = null;
+    }, 1000);
+
     // 治疗仪：每进入新关卡恢复 5 点生命
     if (selectedRelics.includes(16)) {
         playerHealth = Math.min(maxHealth, playerHealth + 5);
@@ -386,6 +398,8 @@ function returnToMenu() {
     clearBackpackItems();
     hasRevive = false;
     isDead = false;
+    monstersActive = true;
+    if (roomStartTimer) { clearTimeout(roomStartTimer); roomStartTimer = null; }
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -411,6 +425,8 @@ function restartGame() {
     clearRelics();
     clearBackpackItems();
     hasRevive = false;
+    monstersActive = true;
+    if (roomStartTimer) { clearTimeout(roomStartTimer); roomStartTimer = null; }
     playerHealth = maxHealth;
     currentLevel = 0;
     x = 200;
@@ -488,6 +504,9 @@ function loop() {
     // 怪物移动 + 碰撞伤害
     for (let i = 0; i < monsters.length; i++) {
         let m = monsters[i];
+        // 房间开始倒计时内怪物不可见、不活动
+        m.element.style.display = monstersActive ? '' : 'none';
+        if (!monstersActive) continue;
         m.update(x, groundHeight + y, player);
 
         // 天空怪蓄力攻击判定（与地面接触伤害分开处理）
