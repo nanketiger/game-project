@@ -1,0 +1,50 @@
+# Team Development Coordination & Coding Rules
+我在这个项目中只负责角色+地图的部分，其他的部分务必不要替我的成员做任何修改
+This project is a collaborative game development effort. To minimize team friction, avoid integration conflicts, and protect the shared codebase, all autonomous modifications made by the AI agent must adhere to strict, conservative boundaries.
+
+## 核心原则 / Core Directive
+**禁止大改，只允许最小化修改。**
+Any structural rewrite, architectural refactoring, or widespread code aesthetic adjustment is strictly forbidden. Every task must be solved with the **absolute minimum number of changed lines of code (LOC)**.
+
+---
+
+## 1. 代码修改规范 / Modification Guidelines
+
+### 🚫 保护原有逻辑 (Preserve Existing Logic)
+* **严禁破坏原有逻辑：** 即使发现队友的代码结构不完美、命名不标准或存在冗余，在不影响你当前任务的前提下，**绝对不允许**擅自重构或重写。
+* **增量式开发 (Incremental Addition)：** 优先考虑通过“添加新函数/新类”或“在原有逻辑外层封装”的方式来实现新功能，而不是直接修改现有的函数体。
+* **边界检查与降级：** 写入新逻辑时，必须确保原有分支的稳定性。新逻辑失败时应能安全降级，不影响原有游戏循环。
+* **代码可读性**：在不修改原有代码的前提下，尽量保持新代码的清晰和可读性，每次给出修改和新增都要附上简短的注释说明。
+* **禁止重复写bug：** 当尝试某种方法或者写法出现了bug，后续严禁再次使用同样的写法，必须换一种新的思路来实现功能。反之，如果某种方法或者写法成功了，后续必须继续使用同样的写法来实现功能，禁止随意更换不同的写法来实现同样的功能。
+
+### 🛠️ 最小化更改原则 (Locality of Change)
+* **精准定位：** 修复 Bug 或实现微调时，只修改最核心的那几行代码。
+* **禁止大范围格式化：** 不要使用全局格式化工具去影响队友的代码（如随意改动缩进、换行、单双引号），这会导致 Git 冲突爆炸。
+* **保留历史注释：** 原代码中的注释、TODO 标记除非完全失效，否则一律保留。
+* 
+### 严格执行提示词 (Strict Prompt Adherence)
+* **遵守提示词指令：** 每次修改前，必须先仔细阅读并理解提示词的要求，每字每句都必须严格遵守，提示词的每一项要求都必须要有实际的代码对应，并给出注释显示指明该段代码对应了哪句提示。不能随意省略任何步骤，必须一步到位完成任务。
+---
+
+## 2. 游戏开发特定约束 / Game-Specific Constraints
+
+### 👾 状态机与核心循环 (State Machine & Game Loop)
+* **严禁修改核心 Tick/Update 循环：** 游戏的主循环（如每帧更新、碰撞检测核心分发、全局状态同步）属于敏感区域，禁止擅自改动。
+* **组件/属性安全：** 在读取或修改游戏实体（Entity/Sprite）的属性时，必须先进行存在性校验（如 `if (entity && entity.components)`），避免引发运行时死机（Null Pointer / Undefined Exception）。
+
+### 📊 资源与配置管理 (Assets & Configuration)
+* **配置文件优先：** 如果需要微调游戏数值（如怪物的移动速度、延时生成时间、伤害系数），优先检查是否有独立的配置文件或常量定义区，不要把数值硬编码（Hardcode）进核心逻辑里。
+
+---
+
+## 3. Git 与团队协作要求 / Git & Workflow Restraints
+
+### 📝 提交信息与变更说明
+* **提供清晰的修改解释：** 每次完成修改后，清晰地陈述：“我改动了哪个文件的哪几行，这么做是为了实现什么，我如何确保它没有影响原本的逻辑。”
+* **杜绝多任务混杂：** 一个会话只解决一个具体的小问题，禁止在同一个修改周期内顺便做其他不相关的微调。
+
+---
+
+## 4. 给 Claude Code 的系统警示 / System Prompt To Agent
+> "When executing tasks, imagine you are a guest programmer working on a fragile, highly volatile production codebase. You do not own this project; your teammates do. Your goal is to blend in seamlessly. Your changes should be so discrete and localized that they look like they were always there, leaving zero ripple effects on the surrounding system."
+

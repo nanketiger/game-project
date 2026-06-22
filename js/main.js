@@ -64,29 +64,9 @@ function addPlatform(x, y, w, h) {
 }
 
 function createPortal() {
-    portal = document.createElement('div');
-    portal.className = 'portal';
-    portalX = (window.innerWidth - 80) / 2;
+    portalX = (window.innerWidth - 78) / 2;
     portalY = groundHeight + 100;
-    portal.style.left = portalX + 'px';
-    portal.style.bottom = portalY + 'px';
-
-    for (let i = 0; i < 20; i++) {
-        let particle = document.createElement('div');
-        particle.className = 'portal-particle';
-        let angle = Math.random() * Math.PI * 2;
-        let radius = 60 + Math.random() * 60;
-        let startX = Math.cos(angle) * radius + 'px';
-        let startY = Math.sin(angle) * radius + 'px';
-        particle.style.setProperty('--startX', startX);
-        particle.style.setProperty('--startY', startY);
-        let duration = 0.8 + Math.random() * 1.5;
-        let delay = Math.random() * 2;
-        particle.style.animation = `suckIn ${duration}s ease-in ${delay}s infinite`;
-        portal.appendChild(particle);
-    }
-
-    document.body.appendChild(portal);
+    portal = new PortalEffect(portalX, portalY);
 }
 
 // 生成掉落物
@@ -116,7 +96,7 @@ function clearPlatforms() {
 
 function clearMap() {
     clearPlatforms();
-    if (portal) { portal.remove(); portal = null; }
+    if (portal) { portal.destroy(); portal = null; }
     monsters.forEach(m => { m.element.remove(); m.hpBarContainer.remove(); });
     monsters = [];
     drops.forEach(d => d.element.remove());
@@ -593,12 +573,13 @@ function loop() {
     // 传送门检测
     if (portal) {
         const pRect = player.getBoundingClientRect();
-        const portRect = portal.getBoundingClientRect();
+        const portTop = window.innerHeight - portalY - 78;
+        const portBottom = window.innerHeight - portalY;
         if (
-            pRect.left < portRect.right &&
-            pRect.right > portRect.left &&
-            pRect.top < portRect.bottom &&
-            pRect.bottom > portRect.top
+            pRect.left < (portalX + 78) &&
+            pRect.right > portalX &&
+            pRect.top < portBottom &&
+            pRect.bottom > portTop
         ) {
             refreshMap();
         }
