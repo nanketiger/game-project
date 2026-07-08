@@ -337,7 +337,7 @@ function refreshMap() {
     }, 1000);
 
     // 治疗仪：每进入新关卡恢复 5 点生命
-    if (selectedRelics.includes(16)) {
+    if (selectedRelics.includes(12)) {
         playerHealth = Math.min(maxHealth, playerHealth + 5);
         updateHealthDisplay();
     }
@@ -554,7 +554,7 @@ function loop() {
         const dRect = drop.element.getBoundingClientRect();
 
         // 收获钩锁：拾取范围扩大 50px
-        const pickupMargin = selectedRelics.includes(9) ? 50 : 0;
+        const pickupMargin = selectedRelics.includes(6) ? 50 : 0;
         if (
             (pRect.left - pickupMargin) < (dRect.right + pickupMargin) &&
             (pRect.right + pickupMargin) > (dRect.left - pickupMargin) &&

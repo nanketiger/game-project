@@ -126,7 +126,7 @@ function shoot(direction = 'horizontal') {
     move();
 
     // 双射管：额外发射一颗子弹
-    if (selectedRelics.includes(10)) {
+    if (selectedRelics.includes(7)) {
         const b2 = document.createElement('div');
         b2.className = 'bullet';
         // 第二发子弹随 playerScale 动态计算位置（高度略高）

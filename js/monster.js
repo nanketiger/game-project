@@ -72,7 +72,7 @@ class Monster {
         this.health = this.maxHealth;
         this.speed = (0.8 + Math.random() * 0.8) * cfg.speedMult * 0.8;
         // 冰霜核心：所有怪物移速降低 30%
-        if (selectedRelics.includes(11)) this.speed *= 0.7;
+        if (selectedRelics.includes(8)) this.speed *= 0.7;
         this.direction = Math.random() > 0.5 ? 1 : -1;
 
         // ================= 状态机核心属性 =================
@@ -325,9 +325,9 @@ class Monster {
         if (this.state === 'dead') return false;
 
         // 瞄准镜：对满血怪物伤害翻倍
-        if (selectedRelics.includes(17) && this.health === this.maxHealth) amount *= 2;
+        if (selectedRelics.includes(13) && this.health === this.maxHealth) amount *= 2;
         // 暴击之芯：15% 概率双倍伤害
-        if (selectedRelics.includes(13) && Math.random() < 0.15) amount *= 2;
+        if (selectedRelics.includes(10) && Math.random() < 0.15) amount *= 2;
 
         this.health -= amount;
 
