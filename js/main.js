@@ -639,4 +639,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') togglePause();
     });
+
+    // 资源全部加载完成后隐藏加载界面
+    window.addEventListener('load', () => {
+        const loading = document.getElementById('loading-screen');
+        if (loading) {
+            loading.classList.add('hidden');
+            loading.classList.remove('active');
+        }
+    });
 });
