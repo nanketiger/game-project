@@ -640,12 +640,81 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Escape') togglePause();
     });
 
-    // 资源全部加载完成后隐藏加载界面
-    window.addEventListener('load', () => {
-        const loading = document.getElementById('loading-screen');
-        if (loading) {
-            loading.classList.add('hidden');
-            loading.classList.remove('active');
+    // 资源加载进度追踪
+    (function trackLoading() {
+        const bar = document.getElementById('loading-bar-fill');
+        const text = document.getElementById('loading-text');
+        if (!bar || !text) return;
+
+        // 收集 CSS 中引用的背景图 + audio + img
+        const resources = new Set();
+
+        // 扫描所有样式表中的 url()
+        try {
+            for (const sheet of document.styleSheets) {
+                try {
+                    for (const rule of sheet.cssRules || []) {
+                        const m = rule.cssText && rule.cssText.match(/url\(["']?([^"')]+)["']?\)/g);
+                        if (m) m.forEach(u => {
+                            const url = u.replace(/url\(["']?|["']?\)/g, '');
+                            if (/\.(png|jpg|jpeg|gif|webp|svg|wav|mp3|ogg)/i.test(url))
+                                resources.add(url);
+                        });
+                    }
+                } catch (_) { /* 跨域样式表无法访问 */ }
+            }
+        } catch (_) {}
+
+        // audio
+        const audio = document.getElementById('bgm');
+        if (audio && audio.src) resources.add(audio.src);
+
+        const total = Math.max(resources.size, 10);
+        let loaded = 0;
+
+        function updateBar(forcePct) {
+            if (forcePct !== undefined) {
+                bar.style.width = forcePct + '%';
+                text.textContent = `正在加载资源... (${forcePct}%)`;
+                return;
+            }
+            loaded++;
+            const pct = Math.round((loaded / total) * 100);
+            bar.style.width = Math.min(pct, 90) + '%';
+            text.textContent = `正在加载资源... (${Math.min(pct, 90)}%)`;
         }
-    });
+
+        // 预加载每个资源
+        let resourceIndex = 0;
+        const resourceList = [...resources];
+        function loadNext() {
+            if (resourceIndex >= resourceList.length) return;
+            const img = new Image();
+            img.onload = img.onerror = () => {
+                updateBar();
+                resourceIndex++;
+                setTimeout(loadNext, 50);
+            };
+            img.src = resourceList[resourceIndex];
+            resourceIndex++;
+        }
+        if (resourceList.length > 0) {
+            updateBar(0);
+            setTimeout(loadNext, 100);
+        }
+
+        // 兜底：window.onload 或 10 秒后强制完成
+        let done = false;
+        function finish() {
+            if (done) return; done = true;
+            bar.style.width = '100%';
+            text.textContent = '加载完成！';
+            setTimeout(() => {
+                const loading = document.getElementById('loading-screen');
+                if (loading) { loading.classList.add('hidden'); loading.classList.remove('active'); }
+            }, 500);
+        }
+        window.addEventListener('load', finish);
+        setTimeout(finish, 10000);
+    })();
 });
