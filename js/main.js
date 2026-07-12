@@ -27,6 +27,10 @@ let monsters = [];
 // 掉落物管理
 let drops = [];
 
+// 炸弹管理
+let bombs = [];
+let lastTrailDamageTime = 0;
+
 // 关卡系统
 const MAX_LEVEL = 10;
 let currentLevel = 1;
@@ -50,6 +54,15 @@ let portalX = 0;
 let portalY = 0;
 
 // ========== 工具函数 ==========
+
+function damagePlayer(amount) {
+    playerHealth = Math.max(0, playerHealth - amount);
+    updateHealthDisplay();
+    if (amount > 0) {
+        player.classList.add('hurt-flash');
+        setTimeout(() => player.classList.remove('hurt-flash'), 150);
+    }
+}
 
 // 创建平台
 function addPlatform(x, y, w, h) {
@@ -97,8 +110,15 @@ function clearPlatforms() {
 function clearMap() {
     clearPlatforms();
     if (portal) { portal.destroy(); portal = null; }
-    monsters.forEach(m => { m.element.remove(); m.hpBarContainer.remove(); });
+    monsters.forEach(m => {
+        if (m.trailElements) m.trailElements.forEach(t => t.element.remove());
+        if (m.warningBeams) m.warningBeams.forEach(b => b.remove());
+        m.element.remove();
+        m.hpBarContainer.remove();
+    });
     monsters = [];
+    bombs.forEach(b => b.remove());
+    bombs = [];
     drops.forEach(d => d.element.remove());
     drops = [];
 }
@@ -114,17 +134,17 @@ function bindMonstersToPlatforms() {
         }
         const mBottom = m.y;
         const mLeft = m.x;
-        const mRight = m.x + m.cfg.w;
+        const mRight = m.x + m.elW;
         let foundPlatform = false;
         for (let p of platforms) {
             const pTop = p.y + p.h;
             if (Math.abs(mBottom - pTop) < 5 &&
                 mRight > p.x && mLeft < p.x + p.w) {
-                if (p.w >= m.cfg.w) {
-                    m.setBounds(p.x, p.x + p.w - m.cfg.w);
+                if (p.w >= m.elW) {
+                    m.setBounds(p.x, p.x + p.w - m.elW);
                 } else {
                     // 平台太窄：将怪物固定在平台中央，防止边界振荡"两张贴图"
-                    const cx = p.x + (p.w - m.cfg.w) / 2;
+                    const cx = p.x + (p.w - m.elW) / 2;
                     m.setBounds(cx, cx);
                 }
                 foundPlatform = true;
@@ -269,9 +289,17 @@ function generateRoom9() {
     monsters.push(new Monster(W / 2 + 80, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
 }
 
-// 第10关：最终关 — 对称多层布局，8只怪物满配
+// 第10关：Boss战 — 1个Boss+小怪混搭
 function generateRoom10() {
     const W = window.innerWidth;
+    const bossScale = 3;
+    const bossTypes = ['sky', 'chase', 'tank'];
+    const bossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
+    const cfg = MONSTER_CONFIG[bossType];
+    const bossW = cfg.w * bossScale;
+    const bossX = (W - bossW) / 2;
+
+    // 原有对称多层布局
     addPlatform(W / 2 - 40, 280, 80, 20);
     addPlatform(W / 2 - 160, 220, 100, 20);
     addPlatform(W / 2 + 60, 220, 100, 20);
@@ -279,14 +307,21 @@ function generateRoom10() {
     addPlatform(W - 180, 160, 120, 20);
     addPlatform(150, 100, 100, 20);
     addPlatform(W - 250, 100, 100, 20);
-    monsters.push(new Monster(W / 2 - 20, 300, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(W / 2 - 140, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(W / 2 + 100, 240, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(80, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(W - 140, 180, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(170, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(W - 230, 120, currentLevel, groundHeight, rollMonsterType(currentLevel)));
-    monsters.push(new Monster(W / 2 - 30, groundHeight, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+
+    // Boss（居中，占地面最多区域）
+    if (bossType === 'sky') {
+        monsters.push(new Monster(bossX, window.innerHeight * 0.55, currentLevel, groundHeight, bossType, bossScale));
+    } else {
+        monsters.push(new Monster(bossX, groundHeight, currentLevel, groundHeight, bossType, bossScale));
+    }
+
+    // 其余5只小怪分散在各平台
+    const sideMonsters = 5;
+    for (let i = 0; i < sideMonsters; i++) {
+        const mx = 80 + Math.random() * (W - 160);
+        const my = groundHeight + Math.random() * 250;
+        monsters.push(new Monster(mx, my, currentLevel, groundHeight, rollMonsterType(currentLevel)));
+    }
 }
 
 // ========== 房间生成调度 ==========
@@ -311,8 +346,10 @@ function generateRoom(level) {
 
 // ========== 地图刷新 ==========
 function updateLevelDisplay() {
-    document.getElementById('level-info').textContent =
-        `关卡: ${currentLevel} / ${MAX_LEVEL}`;
+    const text = currentLevel === MAX_LEVEL
+        ? `最终关: BOSS战`
+        : `关卡: ${currentLevel} / ${MAX_LEVEL}`;
+    document.getElementById('level-info').textContent = text;
 }
 
 function refreshMap() {
@@ -486,24 +523,28 @@ function loop() {
         let m = monsters[i];
         // 房间开始倒计时内怪物不可见、不活动
         m.element.style.display = monstersActive ? '' : 'none';
+        m.hpBarContainer.style.display = monstersActive ? '' : 'none';
         if (!monstersActive) continue;
         m.update(x, groundHeight + y, player);
 
-        // 天空怪蓄力攻击判定（与地面接触伤害分开处理）
-        if (m.type === 'sky' && m.state === 'charge' && m.chargeReady && m.warningZone) {
+        // 天空怪蓄力攻击判定（遍历所有光束）
+        if (m.type === 'sky' && m.state === 'charge' && m.chargeReady && m.warningBeams.length > 0) {
             const pRect = player.getBoundingClientRect();
-            const wRect = m.warningZone.getBoundingClientRect();
             const now = Date.now();
-            if (
-                pRect.left < wRect.right &&
-                pRect.right > wRect.left &&
-                pRect.top < wRect.bottom &&
-                pRect.bottom > wRect.top
-            ) {
-                if (now - lastDamageTime >= damageCooldown) {
-                    playerHealth = Math.max(0, playerHealth - 2);
-                    lastDamageTime = now;
-                    updateHealthDisplay();
+            const beamDamage = m.isBoss ? 6 : 2;
+            for (const beam of m.warningBeams) {
+                const wRect = beam.getBoundingClientRect();
+                if (
+                    pRect.left < wRect.right &&
+                    pRect.right > wRect.left &&
+                    pRect.top < wRect.bottom &&
+                    pRect.bottom > wRect.top
+                ) {
+                    if (now - lastDamageTime >= damageCooldown) {
+                        damagePlayer(beamDamage);
+                        lastDamageTime = now;
+                    }
+                    break;
                 }
             }
             m.finishCharge();
@@ -513,7 +554,15 @@ function loop() {
         if (m.type === 'sky') continue;
 
         const pRect = player.getBoundingClientRect();
-        const mRect = m.element.getBoundingClientRect();
+        const rawMRect = m.element.getBoundingClientRect();
+        // 碰撞框左右各缩 60%，贴近实际角色体积
+        const shrink = rawMRect.width * 0.6;
+        const mRect = {
+            left: rawMRect.left + shrink,
+            right: rawMRect.right - shrink,
+            top: rawMRect.top,
+            bottom: rawMRect.bottom
+        };
         const now = Date.now();
 
         if (
@@ -523,10 +572,38 @@ function loop() {
             pRect.bottom > mRect.top
         ) {
             if (now - lastDamageTime >= damageCooldown) {
-                playerHealth = Math.max(0, playerHealth - 1);
+                damagePlayer(m.contactDamage || 1);
                 lastDamageTime = now;
-                updateHealthDisplay();
             }
+        }
+
+        // Chase Boss 轨迹伤害（独立冷却，每秒2点）
+        if (m.type === 'chase' && m.isBoss && m.trailElements && m.trailElements.length > 0) {
+            const tNow = Date.now();
+            if (tNow - lastTrailDamageTime >= 1000) {
+                for (const t of m.trailElements) {
+                    const tRect = t.element.getBoundingClientRect();
+                    if (
+                        pRect.left < tRect.right && pRect.right > tRect.left &&
+                        pRect.top < tRect.bottom && pRect.bottom > tRect.top
+                    ) {
+                        damagePlayer(2);
+                        lastTrailDamageTime = tNow;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // 更新炸弹（坦克怪投掷）
+    for (let i = bombs.length - 1; i >= 0; i--) {
+        const bomb = bombs[i];
+        bomb.update(x, groundHeight + y, player, (damage) => {
+            damagePlayer(damage);
+        });
+        if (!bomb.alive) {
+            bombs.splice(i, 1);
         }
     }
 
@@ -593,6 +670,7 @@ function loop() {
     const isNowShooting = Date.now() - lastShootTime < 200;
 
     // 根据按键状态切换动画，优先级：死亡 > 射击 > 跳跃 > 跑动 > 待机
+    const hadHurtFlash = player.classList.contains('hurt-flash');
     if (isDead) {
         player.className = 'dead';
     } else if (isNowShooting) {
@@ -604,6 +682,7 @@ function loop() {
     } else {
         player.className = 'idle';
     }
+    if (hadHurtFlash) player.classList.add('hurt-flash');
     
     // 调用 utils.js 中统一声明的 playerScale 来等比例缩放人物大小
     player.style.transform = `scaleX(${faceDir * playerScale}) scaleY(${playerScale})`;
