@@ -49,6 +49,9 @@ let portal = null;
 let portalX = 0;
 let portalY = 0;
 
+// 人物跟随效果
+let playerEffect = null;
+
 // ========== 工具函数 ==========
 
 // 创建平台
@@ -97,6 +100,7 @@ function clearPlatforms() {
 function clearMap() {
     clearPlatforms();
     if (portal) { portal.destroy(); portal = null; }
+    if (playerEffect) { playerEffect.destroy(); playerEffect = null; }
     monsters.forEach(m => { m.element.remove(); m.hpBarContainer.remove(); });
     monsters = [];
     drops.forEach(d => d.element.remove());
@@ -341,6 +345,10 @@ function refreshMap() {
         playerHealth = Math.min(maxHealth, playerHealth + 5);
         updateHealthDisplay();
     }
+
+    // 人物跟随效果：进入新关卡前5秒显示
+    if (playerEffect) playerEffect.destroy();
+    playerEffect = new PlayerEffect(x, groundHeight + y);
 }
 
 // ========== 暂停 ==========
@@ -607,6 +615,9 @@ function loop() {
     
     // 调用 utils.js 中统一声明的 playerScale 来等比例缩放人物大小
     player.style.transform = `scaleX(${faceDir * playerScale}) scaleY(${playerScale})`;
+
+    // 更新人物跟随效果的位置
+    if (playerEffect) playerEffect.update(x, groundHeight + y);
 
     animFrameId = requestAnimationFrame(loop);
 }

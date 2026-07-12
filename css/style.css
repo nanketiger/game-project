@@ -134,9 +134,9 @@ body {
 
 /* 平台样式 */
 .platform {
-    background: #8B4513; /* 棕色平台 */
-    position: absolute; /* 绝对定位，用于游戏中的平台放置 */
-    border-radius: 4px; /* 圆角边框 */
+    background: rgba(63, 22, 102, 0.8);
+    position: absolute;
+    border-radius: 4px;
 }
 
 /* 怪物样式 */
@@ -315,6 +315,8 @@ body {
 }
 
 .start-content {
+    position: relative;
+    z-index: 2;
     text-align: center;
     background: rgba(135, 135, 176, 0.626);
     padding: 40px;
@@ -888,4 +890,53 @@ body {
 .relic-reroll {
     text-align: center;
     margin-top: 25px;
+}
+
+/* ================================================================
+   流体粒子背景
+   Gooey Effect：父容器 filter: blur() + contrast() 产生粘性融合
+   ================================================================ */
+.fluid-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    filter: blur(2px) contrast(10);
+}
+
+/* 每个粒子：内紫外白菱形 + 白色外辉光 */
+.fluid-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #A020F0;
+    box-shadow: 0 0 4px rgba(255,255,255,1), 0 0 12px rgba(255,255,255,0.5);
+    right: -60px;
+    animation: fluidDrift linear infinite;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* 6 个粒子各不同高度、速度、延迟 */
+.fluid-particle:nth-child(1)  { top: 5%;  width:4px; height:4px; animation-duration:5.5s; animation-delay:-0.2s; }
+.fluid-particle:nth-child(2)  { top: 14%; width:2px; height:2px; animation-duration:4.0s; animation-delay:-1.5s; }
+.fluid-particle:nth-child(3)  { top: 22%; width:4px; height:4px; animation-duration:7.0s; animation-delay:-3.0s; }
+.fluid-particle:nth-child(4)  { top: 30%; width:2px; height:2px; animation-duration:3.5s; animation-delay:-0.8s; }
+.fluid-particle:nth-child(5)  { top: 38%; width:5px; height:5px; animation-duration:8.0s; animation-delay:-4.5s; }
+.fluid-particle:nth-child(6)  { top: 46%; width:3px; height:3px; animation-duration:4.5s; animation-delay:-2.0s; }
+.fluid-particle:nth-child(7)  { top: 54%; width:4px; height:4px; animation-duration:3.2s; animation-delay:-1.0s; }
+.fluid-particle:nth-child(8)  { top: 62%; width:2px; height:2px; animation-duration:6.0s; animation-delay:-3.5s; }
+.fluid-particle:nth-child(9)  { top: 70%; width:3px; height:3px; animation-duration:4.8s; animation-delay:-2.5s; }
+.fluid-particle:nth-child(10) { top: 78%; width:4px; height:4px; animation-duration:3.0s; animation-delay:-0.5s; }
+.fluid-particle:nth-child(11) { top: 86%; width:2px; height:2px; animation-duration:5.2s; animation-delay:-4.0s; }
+.fluid-particle:nth-child(12) { top: 93%; width:3px; height:3px; animation-duration:4.2s; animation-delay:-1.8s; }
+
+/* 横向漂移动画 */
+@keyframes fluidDrift {
+    0%   { transform: translateX(0);    opacity: 0;   }
+    5%   { opacity: 1;                                  }
+    90%  { opacity: 1;                                  }
+    100% { transform: translateX(calc(-100vw - 120px)); opacity: 0; }
 }
