@@ -62,9 +62,15 @@ body {
     background-position: -256px 0px; 
 }
 
+/* 受伤闪红 */
+#player.hurt-flash {
+    filter: brightness(2.5) drop-shadow(0 0 12px red) !important;
+    transition: filter 0.1s;
+}
+
 /* 死亡状态 */
 #player.dead {
-    width: 128px;               
+    width: 128px;
     height: 128px;
     background-image: url('../craftpix-net-507107-free-soldier-sprite-sheets-pixel-art/Soldier_1/Dead.png'); 
     background-size: 512px 128px; 
@@ -939,4 +945,49 @@ body {
     5%   { opacity: 1;                                  }
     90%  { opacity: 1;                                  }
     100% { transform: translateX(calc(-100vw - 120px)); opacity: 0; }
+}
+
+/* ========== 炸弹与爆炸效果 ========== */
+.bomb {
+    position: absolute;
+    background: radial-gradient(circle, #FF4444 0%, #880000 70%, #440000 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.7);
+    z-index: 15;
+    pointer-events: none;
+}
+
+.explosion {
+    position: absolute;
+    background: radial-gradient(circle,
+        rgba(255, 200, 50, 0.9) 0%,
+        rgba(255, 100, 20, 0.7) 30%,
+        rgba(255, 30, 0, 0.3) 60%,
+        rgba(100, 0, 0, 0) 100%);
+    border-radius: 50%;
+    z-index: 20;
+    pointer-events: none;
+    animation: explodeAnim 0.5s ease-out forwards;
+}
+
+@keyframes explodeAnim {
+    0%   { transform: scale(0.3); opacity: 1; }
+    50%  { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ========== Boss 轨迹 ========== */
+.boss-trail {
+    position: absolute;
+    background: rgba(100, 15, 15, 0.55);
+    border-radius: 3px;
+    z-index: 5;
+    pointer-events: none;
+    animation: trailFade 3s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0%   { opacity: 0.65; }
+    80%  { opacity: 0.25; }
+    100% { opacity: 0; }
 }
