@@ -55,6 +55,9 @@ let portalY = 0;
 
 // 人物跟随效果
 let playerEffect = null;
+// 待机光环
+let idleAura = null;
+let idleTimer = 0;
 
 // ========== 工具函数 ==========
 
@@ -114,6 +117,8 @@ function clearMap() {
     clearPlatforms();
     if (portal) { portal.destroy(); portal = null; }
     if (playerEffect) { playerEffect.destroy(); playerEffect = null; }
+    if (idleAura) { idleAura.destroy(); idleAura = null; }
+    idleTimer = 0;
     monsters.forEach(m => {
         if (m.trailElements) m.trailElements.forEach(t => t.element.remove());
         if (m.warningBeams) m.warningBeams.forEach(b => b.remove());
@@ -386,6 +391,14 @@ function refreshMap() {
     // 人物跟随效果：进入新关卡前5秒显示
     if (playerEffect) playerEffect.destroy();
     playerEffect = new PlayerEffect(x, groundHeight + y);
+
+    // 第5关起切换背景
+    const skyEl = document.querySelector('.sky-background');
+    if (skyEl) {
+        skyEl.style.backgroundImage = currentLevel >= 5
+            ? 'url("images/内部背景3.png")'
+            : 'url("images/内部背景2.png")';
+    }
 }
 
 // ========== 暂停 ==========
@@ -474,9 +487,22 @@ function loop() {
     }
 
     // 移动（仅在没死的情况下可以操作）
+    const isMoving = keys.a || keys.d;
     if (!isDead) {
         if (keys.a) { x -= speed; faceDir = -1; }
         if (keys.d) { x += speed; faceDir = 1; }
+    }
+
+    // 待机检测：无任何操作时计时，满2秒显示光环
+    const isActing = isMoving || keys.k || keys.j || keys.w || keys.s;
+    if (!isDead && isOnGround && !isActing) {
+        idleTimer++;
+        if (idleTimer >= 120 && !idleAura) {  // 2秒 @ 60fps
+            idleAura = new IdleAura(x, groundHeight + y);
+        }
+    } else {
+        if (idleAura) { idleAura.destroy(); idleAura = null; }
+        idleTimer = 0;
     }
 
     // 边界
@@ -697,6 +723,7 @@ function loop() {
 
     // 更新人物跟随效果的位置
     if (playerEffect) playerEffect.update(x, groundHeight + y);
+    if (idleAura) idleAura.update(x, groundHeight + y);
 
     animFrameId = requestAnimationFrame(loop);
 }
