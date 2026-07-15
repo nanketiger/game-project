@@ -11,8 +11,8 @@ let gravity = 0.3;
 let isOnGround = false;
 
 // 血量
-let playerHealth = 100;
-let maxHealth = 100;
+let playerHealth = 30;
+let maxHealth = 50;
 let isDead = false; // 是否死亡状态
 
 // 子弹伤害
@@ -58,6 +58,8 @@ let playerEffect = null;
 // 待机光环
 let idleAura = null;
 let idleTimer = 0;
+// 复活芯片光环
+let reviveAura = null;
 
 // ========== 工具函数 ==========
 
@@ -118,6 +120,7 @@ function clearMap() {
     if (portal) { portal.destroy(); portal = null; }
     if (playerEffect) { playerEffect.destroy(); playerEffect = null; }
     if (idleAura) { idleAura.destroy(); idleAura = null; }
+    if (reviveAura) { reviveAura.destroy(); reviveAura = null; }
     idleTimer = 0;
     monsters.forEach(m => {
         if (m.trailElements) m.trailElements.forEach(t => t.element.remove());
@@ -438,7 +441,7 @@ function returnToMenu() {
     isDead = false;
     monstersActive = true;
     if (roomStartTimer) { clearTimeout(roomStartTimer); roomStartTimer = null; }
-    playerHealth = maxHealth;
+    playerHealth = 30;
     currentLevel = 0;
     x = 200;
     y = 0;
@@ -465,7 +468,7 @@ function restartGame() {
     hasRevive = false;
     monstersActive = true;
     if (roomStartTimer) { clearTimeout(roomStartTimer); roomStartTimer = null; }
-    playerHealth = maxHealth;
+    playerHealth = 30;
     currentLevel = 0;
     x = 200;
     y = 0;
@@ -491,6 +494,14 @@ function loop() {
     if (!isDead) {
         if (keys.a) { x -= speed; faceDir = -1; }
         if (keys.d) { x += speed; faceDir = 1; }
+    }
+
+    // 复活芯片光环：有芯片时显示，芯片消耗时移除
+    if (hasRevive && !reviveAura) {
+        reviveAura = new ReviveEffect(x, groundHeight + y);
+    } else if (!hasRevive && reviveAura) {
+        reviveAura.destroy();
+        reviveAura = null;
     }
 
     // 待机检测：无任何操作时计时，满2秒显示光环
@@ -724,6 +735,7 @@ function loop() {
     // 更新人物跟随效果的位置
     if (playerEffect) playerEffect.update(x, groundHeight + y);
     if (idleAura) idleAura.update(x, groundHeight + y);
+    if (reviveAura) reviveAura.update(x, groundHeight + y);
 
     animFrameId = requestAnimationFrame(loop);
 }

@@ -265,7 +265,7 @@ function initGame() {
     }
 
     // 重置游戏状态
-    playerHealth = maxHealth;
+    // 不覆盖 playerHealth，保持 main.js 声明的初始值
     currentLevel = 0;
 
     updateHealthDisplay();
