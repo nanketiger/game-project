@@ -16,7 +16,7 @@ let maxHealth = 50;
 let isDead = false; // 是否死亡状态
 
 // 子弹伤害
-let bulletDamage = 100;
+let bulletDamage = 5;
 
 // 平台
 let platforms = [];
