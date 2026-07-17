@@ -494,6 +494,7 @@ body {
     display: flex;
     flex-direction: column;
     background: rgba(44, 62, 80, 0.8);
+    overflow-y: auto;
 }
 
 .item-preview {
