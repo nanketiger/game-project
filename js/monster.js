@@ -307,6 +307,12 @@ class Monster {
                     // 如果平台太窄被钉死（两边界相等），跳过位移防止振荡
                     if (this.boundsMinX !== null && this.boundsMinX === this.boundsMaxX) {
                         this.x = this.boundsMinX;
+                        // 窄平台原地切换朝向，避免看起来完全卡死
+                        this.patrolTimer++;
+                        if (this.patrolTimer >= 60) {
+                            this.patrolTimer = 0;
+                            this.direction *= -1;
+                        }
                     } else {
                         this.x += this.speed * this.direction;
                         // 边界反弹（使用自定义边界或屏幕边缘）
@@ -314,45 +320,33 @@ class Monster {
                         const maxX = this.boundsMaxX !== null ? this.boundsMaxX : window.innerWidth - this.elW;
                         if (this.x <= minX) { this.x = minX; this.direction = 1; }
                         else if (this.x >= maxX) { this.x = maxX; this.direction = -1; }
-                        // TODO: 巡逻AI增强（走走停停+随机变向），当前效果不理想，暂注释
-                        // this.patrolTimer--;
-                        // if (this.patrolTimer <= 0) {
-                        //     if (this.patrolPhase === 'move') {
-                        //         this.patrolPhase = 'idle';
-                        //         this.patrolTimer = 20 + Math.floor(Math.random() * 40);
-                        //     } else {
-                        //         this.patrolPhase = 'move';
-                        //         this.patrolTimer = 60 + Math.floor(Math.random() * 90);
-                        //         if (Math.random() < 0.15) this.direction *= -1;
-                        //     }
-                        // }
-                        // if (this.patrolPhase === 'move') {
-                        //     this.x += this.speed * this.direction;
-                        //     if (Math.random() < 0.005) this.direction *= -1;
-                        // }
-                        // 追击型怪物检测玩家距离
-                        if (this.type === 'chase' && playerX !== undefined) {
-                            const dist = Math.abs(this.x - playerX);
-                            if (dist < this.cfg.detectRange) {
-                                this.changeState('pursue');
-                            }
+                    }
+                    // 追击型怪物检测玩家距离
+                    if (this.type === 'chase' && playerX !== undefined) {
+                        const dist = Math.abs(this.x - playerX);
+                        if (dist < this.cfg.detectRange) {
+                            this.changeState('pursue');
                         }
-                        // 坦克怪攻击冷却与投弹
-                        if (this.type === 'tank' && playerX !== undefined) {
-                            this.attackCooldown--;
-                            if (this.attackCooldown <= 0) {
-                                this.throwBomb(playerX, playerY !== undefined ? playerY : this.groundHeight);
-                                this.attackCooldown = 150 + Math.floor(Math.random() * 60);
-                            }
+                    }
+                    // 坦克怪攻击冷却与投弹
+                    if (this.type === 'tank' && playerX !== undefined) {
+                        this.attackCooldown--;
+                        if (this.attackCooldown <= 0) {
+                            this.throwBomb(playerX, playerY !== undefined ? playerY : this.groundHeight);
+                            this.attackCooldown = 150 + Math.floor(Math.random() * 60);
                         }
                     }
                 }
                 break;
 
             case 'pursue':
+                // 钉死在窄平台上：无法追击，直接回巡逻
                 if (this.boundsMinX !== null && this.boundsMinX === this.boundsMaxX) {
                     this.x = this.boundsMinX;
-                } else if (playerX !== undefined) {
+                    this.changeState('patrol');
+                    break;
+                }
+                if (playerX !== undefined) {
                     this.direction = playerX > this.x ? 1 : -1;
                     this.x += this.speed * this.direction;
                     const pMinX = this.boundsMinX !== null ? this.boundsMinX : 0;
@@ -360,11 +354,18 @@ class Monster {
                     if (this.x <= pMinX) this.x = pMinX;
                     if (this.x >= pMaxX) this.x = pMaxX;
                 }
-                if (playerX !== undefined) {
-                    const dist = Math.abs(this.x - playerX);
-                    if (dist > this.cfg.detectRange * 1.5) {
+                // 退出追击：X轴超出1.5倍检测范围，或Y轴差距过大（玩家在不同高度层）
+                if (playerX !== undefined && playerY !== undefined) {
+                    const distX = Math.abs(this.x - playerX);
+                    const distY = Math.abs(this.y - playerY);
+                    if (distX > this.cfg.detectRange * 1.5 || distY > 150) {
                         this.changeState('patrol');
                     }
+                }
+                // 追击超时保护（约5秒后自动放弃）
+                this.stateTimer++;
+                if (this.stateTimer > 300) {
+                    this.changeState('patrol');
                 }
                 // 坦克怪在追击时也可投弹
                 if (this.type === 'tank' && playerX !== undefined) {
